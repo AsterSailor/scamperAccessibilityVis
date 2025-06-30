@@ -22,6 +22,7 @@ const stepOnceButton = document.getElementById('step-once')! as HTMLButtonElemen
 const stepStmtButton = document.getElementById('step-stmt')! as HTMLButtonElement
 const stepAllButton  = document.getElementById('step-all')! as HTMLButtonElement
 const astTextButton = document.getElementById('ast-text')! as HTMLButtonElement
+const drawButton = document.getElementById('vis-draw')! as HTMLButtonElement
 
 
 class IDE {
@@ -164,6 +165,9 @@ class IDE {
     })
     astTextButton.addEventListener('click', () => {
       this.showASTText()
+    })
+    drawButton.addEventListener('click', () => {
+      this.scamper!.drawVis()
     })
     astWindowButton.addEventListener('click', () => {
       this.saveCurrentFile()

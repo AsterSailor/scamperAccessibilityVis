@@ -24,7 +24,7 @@ class SyntaxNode {
 
     constructor(syntax: Value.Syntax, parent: string | null = null, index: number | null = null) {
         this.syntax = syntax; 
-        console.log("range is", (syntax as any).range);
+        //console.log("range is", (syntax as any).range);
         this.parentname = parent;
         this.index = index;
         let v: T = this.syntax.value;

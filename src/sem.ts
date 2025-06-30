@@ -1,6 +1,6 @@
 import { ICE, Id, Library, Range, ScamperError, Stmt } from './lang.js'
 import { Env, Prog, Op, reservedWords, Value, } from './lang.js'
-import { renderToHTML, mkCodeElement, mkSourceBlock, renderToOutput } from './display.js'
+import { renderToHTML, mkCodeElement, mkSourceBlock, renderToOutput , renderToDraw } from './display.js'
 import * as C from './contract.js'
 
 let maxCallStackDepth = 100000;
@@ -80,6 +80,14 @@ class ExecutionState {
     this.control.jumpTo(label)
     this.control.idx += 1
   }
+
+  public getBoundsEnv(libNum: number): [Id, Value.T][] | undefined {
+    return this.env.toString2(libNum)
+  }
+  // public toStringStack(): string | undefined {
+    
+  //   return this.stack
+  // }
 }
 
 ///// Raising (ops to values) //////////////////////////////////////////////////
@@ -382,6 +390,8 @@ export function tryMatch (p: Value.T, v: Value.T, range?: Range): [string, Value
     return undefined
   }
 }
+
+
 
 function stepPrim (state: ExecutionState): boolean {
   const op = state.control.next()
@@ -916,5 +926,34 @@ export class Sem {
     } catch (e) {
       renderToOutput(this.display, e)
     }
+  }
+
+  draw (): void {
+    let envState = this.state
+    let initialLibNum = 0
+    console.log("here4")
+    this.builtinLibs.forEach(l => {
+      initialLibNum += l.lib.length
+    })
+    if(envState != undefined){
+      let bounded = envState.getBoundsEnv(initialLibNum)
+      console.log("draw")
+      renderToDraw(this.display, "------------------------------~")
+      bounded?.forEach(e => {
+        //renderToDraw(this.display, e[0])
+        let strVal = e[1]?.toString()
+        
+        // if(e[1] === 'vector') {
+        //   let vec = this.env.get(e[0])
+        //   for(let i = 0; i < vec.length; i+)
+        //   strVal.concat()
+        // }
+        if(strVal != undefined) {
+         renderToDraw(this.display, e[0] + "  --->  " + strVal)
+        }
+      })
+      renderToDraw(this.display, "------------------------------~")
+    }
+    console.log("outside undifiii")
   }
 }

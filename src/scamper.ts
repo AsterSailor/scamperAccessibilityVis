@@ -62,8 +62,9 @@ export class Scamper {
     this.parseroutput.ast.renderTree(this.display, this.parseroutput.ast.nodes);
   }
 
-  stepProgram () { this.sem.step() }
+  stepProgram () { console.log("stepper"); this.sem.step(); console.log("dV"); this.sem.draw() }
   stepStmtProgram () { this.sem.stepToNextStmt() }
+  drawVis () {console.log("dV"); this.sem.draw() }
 }
 
 export default Scamper

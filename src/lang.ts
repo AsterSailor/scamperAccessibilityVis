@@ -348,13 +348,20 @@ export namespace Op {
   export const mkExn = (msg: string, modName?: string, range?: Range, source?: string): T => ({ tag: 'exn', msg, modName, range, source })
 }
 
+let initialNum = 0;
+
 export class Env {
   private bindings: Map<Id, Value.T>
+  //private sorryPM: ImageBitmapRenderingContextSettings.
   private parent?: Env
+  static stringed: string
 
   constructor (bindings: [Id, Value.T][], parent?: Env) {
     this.bindings = new Map(bindings)
     this.parent = parent
+    if(initialNum === 0) {
+      initialNum = this.bindings.size
+    }
   }
 
   has (name: Id): boolean {
@@ -393,6 +400,35 @@ export class Env {
     const ret = this.clone()
     ret.remove(...names)
     return ret 
+  }
+
+  static vectorToPrint(bound: [Id, Value.T]): string {
+    let str = ""
+    
+    
+    return str
+  }
+
+  public toString2(libNum: number) {
+    let s = ""
+    let values = this.bindings.values()
+    let strings = this.bindings.keys()
+    // let cloned = this.clone()
+    // const iterator1 = this.bindings[Symbol.iterator]();
+    const iterator1 = this.bindings[Symbol.iterator]();
+
+    let bounds: [Id, Value.T][] = []
+    let count = -7
+    for (const item of iterator1) {
+      if(count > libNum) {
+        console.log(item)
+        bounds.push(item)
+      }
+      count += 1;
+      console.log(libNum)
+    }
+
+    return bounds
   }
 }
 

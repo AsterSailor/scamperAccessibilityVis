@@ -132,3 +132,11 @@ export function renderToOutput(output: HTMLElement, v: any) {
   div.appendChild(renderToHTML(v))
   output!.appendChild(div)
 }
+
+export function renderToDraw(output: HTMLElement, s: string | undefined) {
+  const div = document.createElement('div')
+  div.classList.add('scamper-output')
+  div.append(s? s : "undiifi")
+  console.log("rtd")
+  output!.appendChild(div)
+}
