@@ -797,6 +797,7 @@ export class Sem {
       }
       if (this.isTracing()) {
         this.appendToCurrentTrace(mkCodeElement(`${name} bound`))
+        this.draw()
       }
       this.advance()
     }
@@ -825,6 +826,7 @@ export class Sem {
     this.env = executeStructDecl(id, fields, this.env)
     if (this.isTracing()) {
       this.appendToCurrentTrace(`Struct ${id} declared`)
+      this.draw()
     }
     this.advance()
   }
@@ -852,6 +854,7 @@ export class Sem {
         throw new ICE('sem.step', `Stack size is not 1 after execution: ${this.state.stack}`)
       }
       renderToOutput(this.display, valToExp(this.state.stack.pop()))
+      this.draw()
       this.advance()
     }
   }
@@ -885,6 +888,7 @@ export class Sem {
           maxCallStackDepth = (value as any)['value']
       } else if (this.defaultDisplay) {
         renderToOutput(this.display, valToExp(value))
+        this.draw()
       }
       this.advance()
     }
@@ -894,7 +898,9 @@ export class Sem {
     let stmt = this.prog[this.curStmt]
     switch (stmt.kind) {
       case 'binding':
+        //this.draw()
         this.stepDefine(stmt.name, stmt.body, stmt.range)
+        //this.draw()
         break
       case 'exp':
         this.stepExp(stmt.body)
