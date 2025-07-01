@@ -959,6 +959,8 @@ export class Sem {
     if(envState != undefined){
       let bounded = envState.getBoundsEnv(initialLibNum)
       console.log("draw")
+      let stack = envState.getStack()
+      if(!stack[0]) {
       renderToDraw(this.display, "------------------------------~")
       bounded?.forEach(e => {
         //renderToDraw(this.display, e[0])
@@ -974,12 +976,10 @@ export class Sem {
         }
       })
       renderToDraw(this.display, "------------------------------~")
-      let stack = envState.getStack()
+    }
       console.log("we should have the stack")
       console.log(stack)
       //renderToDraw(this.display, e[0])
-      
-      let strVal = stack.toString()
       
       // if(e[1] === 'vector') {
       //   let vec = this.env.get(e[0])
@@ -988,7 +988,7 @@ export class Sem {
       // }
       let stackString;
       console.log("this is stack[0]" + stack[0])
-      if(!stack[0]) {
+      if(stack[0]) {
         stackString = stack[stack.length - 1]?.toString()
         console.log("stack is NOT undefined")
         renderToDraw(this.display,  "---> " + stackString)
