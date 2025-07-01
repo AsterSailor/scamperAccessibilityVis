@@ -84,6 +84,10 @@ class ExecutionState {
   public getBoundsEnv(libNum: number): [Id, Value.T][] | undefined {
     return this.env.toString2(libNum)
   }
+
+  public getStack() {
+    return this.stack
+  }
   // public toStringStack(): string | undefined {
     
   //   return this.stack
@@ -739,6 +743,7 @@ export class Sem {
       v = mkCodeElement(v)
     }
     this.traces![this.curStmt]!.appendChild(v)
+    //this.draw()
   }
 
   advance (): void {
@@ -779,6 +784,7 @@ export class Sem {
       } catch (e) {
         renderToOutput(this.display, e)
         this.advance()
+        this.draw()
       }
     } else {
       if (this.state.stack.length !== 1) {
@@ -797,8 +803,9 @@ export class Sem {
       }
       if (this.isTracing()) {
         this.appendToCurrentTrace(mkCodeElement(`${name} bound`))
-        this.draw()
+        
       }
+      this.draw()
       this.advance()
     }
   }
@@ -814,6 +821,7 @@ export class Sem {
       if (this.isTracing()) {
         this.appendToCurrentTrace(`Module ${modName} imported`)
       }
+      this.draw()
       this.advance()
     } else {
       this.advance()
@@ -826,8 +834,9 @@ export class Sem {
     this.env = executeStructDecl(id, fields, this.env)
     if (this.isTracing()) {
       this.appendToCurrentTrace(`Struct ${id} declared`)
-      this.draw()
+      
     }
+    this.draw()
     this.advance()
   }
 
@@ -847,6 +856,7 @@ export class Sem {
         }
       } catch (e) {
         renderToOutput(this.display, e)
+        this.draw()
         this.advance()
       }
     } else {
@@ -872,9 +882,11 @@ export class Sem {
           this.appendToCurrentTrace(' ')
           this.appendToCurrentTrace(renderToHTML(stateToExp(this.state)!))
           this.appendToCurrentTrace('\n')
+          //this.draw()
         }
       } catch (e) {
         renderToOutput(this.display, e)
+        this.draw()
         this.advance()
       }
     } else {
@@ -888,8 +900,9 @@ export class Sem {
           maxCallStackDepth = (value as any)['value']
       } else if (this.defaultDisplay) {
         renderToOutput(this.display, valToExp(value))
-        this.draw()
+        //this.draw()
       }
+      this.draw()
       this.advance()
     }
   }
@@ -899,10 +912,12 @@ export class Sem {
     switch (stmt.kind) {
       case 'binding':
         //this.draw()
+        console.log('binding')
         this.stepDefine(stmt.name, stmt.body, stmt.range)
         //this.draw()
         break
       case 'exp':
+        console.log("exp")
         this.stepExp(stmt.body)
         break
       case 'import':
@@ -941,24 +956,49 @@ export class Sem {
     this.builtinLibs.forEach(l => {
       initialLibNum += l.lib.length
     })
+    
     if(envState != undefined){
+      let stack = envState.getStack()
+
       let bounded = envState.getBoundsEnv(initialLibNum)
-      console.log("draw")
-      renderToDraw(this.display, "------------------------------~")
-      bounded?.forEach(e => {
-        //renderToDraw(this.display, e[0])
-        let strVal = e[1]?.toString()
-        
-        // if(e[1] === 'vector') {
-        //   let vec = this.env.get(e[0])
-        //   for(let i = 0; i < vec.length; i+)
-        //   strVal.concat()
-        // }
-        if(strVal != undefined) {
-         renderToDraw(this.display, e[0] + "  --->  " + strVal)
-        }
-      })
-      renderToDraw(this.display, "------------------------------~")
+      if(stack[0] == undefined) {
+        console.log("draw")
+        renderToDraw(this.display, "------------------------------~")
+        bounded?.forEach(e => {
+          //renderToDraw(this.display, e[0])
+          let strVal = e[1]?.toString()
+          
+          // if(e[1] === 'vector') {
+          //   let vec = this.env.get(e[0])
+          //   for(let i = 0; i < vec.length; i+)
+          //   strVal.concat()
+          // }
+          if(strVal != undefined) {
+          renderToDraw(this.display, e[0] + "  --->  " + strVal)
+          }
+        })
+        renderToDraw(this.display, "------------------------------~")
+      }
+      console.log("we should have the stack")
+      console.log(stack)
+      //renderToDraw(this.display, e[0])
+      
+      let strVal = stack.toString()
+      
+      // if(e[1] === 'vector') {
+      //   let vec = this.env.get(e[0])
+      //   for(let i = 0; i < vec.length; i+)
+      //   strVal.concat()
+      // }
+      let stackString;
+      console.log("this is stack[0]" + stack[0])
+      if(stack[0] != undefined) {
+        stackString = stack[stack.length - 1]?.toString()
+        console.log("stack is NOT undefined")
+        renderToDraw(this.display,  "---> " + stackString)
+      }
+      console.log("stack is undefined")
+      
     }
     console.log("outside undifiii")
   }
