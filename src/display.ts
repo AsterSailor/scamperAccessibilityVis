@@ -137,6 +137,6 @@ export function renderToDraw(output: HTMLElement, s: string | undefined) {
   const div = document.createElement('div')
   div.classList.add('scamper-output')
   div.append(s? s : "undiifi")
-  console.log("rtd")
+  //console.log("rtd")
   output!.appendChild(div)
 }

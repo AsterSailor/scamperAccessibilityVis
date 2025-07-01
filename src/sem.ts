@@ -956,29 +956,25 @@ export class Sem {
     this.builtinLibs.forEach(l => {
       initialLibNum += l.lib.length
     })
-    
     if(envState != undefined){
-      let stack = envState.getStack()
-
       let bounded = envState.getBoundsEnv(initialLibNum)
-      if(stack[0] == undefined) {
-        console.log("draw")
-        renderToDraw(this.display, "------------------------------~")
-        bounded?.forEach(e => {
-          //renderToDraw(this.display, e[0])
-          let strVal = e[1]?.toString()
-          
-          // if(e[1] === 'vector') {
-          //   let vec = this.env.get(e[0])
-          //   for(let i = 0; i < vec.length; i+)
-          //   strVal.concat()
-          // }
-          if(strVal != undefined) {
-          renderToDraw(this.display, e[0] + "  --->  " + strVal)
-          }
-        })
-        renderToDraw(this.display, "------------------------------~")
-      }
+      console.log("draw")
+      renderToDraw(this.display, "------------------------------~")
+      bounded?.forEach(e => {
+        //renderToDraw(this.display, e[0])
+        let strVal = e[1]?.toString()
+        
+        // if(e[1] === 'vector') {
+        //   let vec = this.env.get(e[0])
+        //   for(let i = 0; i < vec.length; i+)
+        //   strVal.concat()
+        // }
+        if(strVal != undefined) {
+         renderToDraw(this.display, e[0] + "  --->  " + strVal)
+        }
+      })
+      renderToDraw(this.display, "------------------------------~")
+      let stack = envState.getStack()
       console.log("we should have the stack")
       console.log(stack)
       //renderToDraw(this.display, e[0])
@@ -992,7 +988,7 @@ export class Sem {
       // }
       let stackString;
       console.log("this is stack[0]" + stack[0])
-      if(stack[0] != undefined) {
+      if(!stack[0]) {
         stackString = stack[stack.length - 1]?.toString()
         console.log("stack is NOT undefined")
         renderToDraw(this.display,  "---> " + stackString)
