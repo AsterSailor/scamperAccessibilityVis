@@ -695,6 +695,57 @@ function makeTraceHeader (s: Stmt.T): HTMLElement {
   }
 }
 
+function drawVector(vector: any[]) {
+  let str = ''
+  vector.forEach(e => {
+    str = str + '[' + e + ']'
+  })
+
+  return str
+}
+
+function drawList(list: any): any {
+  //console.log('in func')
+  if(list.isList === true) {
+    //console.log('found true')
+    let str = '{ '
+    let val = list.fst
+    let next = list.snd
+    //console.log('val: ' + val + ' and next: ' + next)
+    if(typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean') {
+    //  console.log(val)
+      str = str + val + ''
+    }
+    //console.log('str so far: ' + str)
+    if(next === null) {
+    //  console.log('found the end ' + next)
+      return str + ' }{ /}'
+    } else {
+    //  console.log('call with ' + next)
+      return str = str + ' }{ -}-> ' + drawList(next)
+    }
+    
+  }
+}
+
+function drawPair(pair: any): any {
+  let str = ''
+  let fst = pair.fst
+  let snd = pair.snd
+  console.log("pair")
+  if(typeof fst === 'string' || typeof fst === 'number' || typeof fst === 'boolean') {
+    console.log(fst)
+    str = str + '{ ' + fst
+  }
+  str = str + ' }{ '
+  if(typeof fst === 'string' || typeof fst === 'number' || typeof fst === 'boolean') {
+    console.log(snd)
+    str = str + snd + ' }'
+  }
+  console.log(str)
+  return str
+}
+
 export class Sem {
   display: HTMLElement
   env: Env
@@ -964,18 +1015,27 @@ export class Sem {
       renderToDraw(this.display, "------------------------------~")
       bounded?.forEach(e => {
         //renderToDraw(this.display, e[0])
+        
         let strVal = e[1]?.toString()
         
-        // if(e[1] === 'vector') {
-        //   let vec = this.env.get(e[0])
-        //   for(let i = 0; i < vec.length; i+)
-        //   strVal.concat()
-        // }
+        console.log(e[1])
         if(strVal != undefined) {
+          if(typeof e[1] === 'string' && typeof e[0] === 'number') {
+            strVal = strVal
+          } else if (e[1] != undefined && Array.isArray(e[1])) {
+            strVal = drawVector(e[1])
+          } else if (e[1] != undefined && Value.typeOf(e[1]) === 'list') {
+            strVal = drawList(e[1])
+          } else if (e[1] != undefined && Value.isPair(e[1])) {
+            strVal = drawPair(e[1])
+          } else {
+            strVal
+          }
+          
          renderToDraw(this.display, e[0] + "  --->  " + strVal)
         }
       })
-      renderToDraw(this.display, "------------------------------~")
+      renderToDraw(this.display, "------------------------------^")
     }
       console.log("we should have the stack")
       console.log(stack)
@@ -991,6 +1051,15 @@ export class Sem {
       if(stack[0]) {
         stackString = stack[stack.length - 1]?.toString()
         console.log("stack is NOT undefined")
+        if(typeof stack[0] != 'string' && typeof stack[0] != 'number') {
+          if(stack[0] != undefined && Array.isArray(stack[0])) {
+            stackString = drawVector(stack[0])
+          } else if (stack[0] != undefined && Value.typeOf(stack[0]) === 'list') {
+            stackString = drawList(stack[0])
+          } else if (stack[0] != undefined && Value.isPair(stack[0])) {
+            stackString = drawPair(stack[0])
+          }
+        }
         renderToDraw(this.display,  "---> " + stackString)
       }
       console.log("stack is undefined")
