@@ -704,6 +704,17 @@ function drawVector(vector: any[]) {
   return str
 }
 
+function drawVectorHTML(vector: any[]) {
+  let div = document.createElement('div')
+  vector.forEach(e => {
+    let but = document.createElement('button')
+    but.textContent = e + ''
+    div.appendChild(but)
+  })
+
+  return div
+}
+
 function drawList(list: any): any {
   //console.log('in func')
   if(list.isList === true) {
@@ -1017,6 +1028,7 @@ export class Sem {
         //renderToDraw(this.display, e[0])
         
         let strVal = e[1]?.toString()
+        let HTMLVal
         
         console.log(e[1])
         if(strVal != undefined) {
@@ -1024,6 +1036,7 @@ export class Sem {
             strVal = strVal
           } else if (e[1] != undefined && Array.isArray(e[1])) {
             strVal = drawVector(e[1])
+            HTMLVal = drawVectorHTML(e[1])
           } else if (e[1] != undefined && Value.typeOf(e[1]) === 'list') {
             strVal = drawList(e[1])
           } else if (e[1] != undefined && Value.isPair(e[1])) {
@@ -1033,6 +1046,7 @@ export class Sem {
           }
           
          renderToDraw(this.display, e[0] + "  --->  " + strVal)
+         renderToDraw(this.display, HTMLVal)
         }
       })
       renderToDraw(this.display, "------------------------------^")
@@ -1053,7 +1067,7 @@ export class Sem {
         console.log("stack is NOT undefined")
         if(typeof stack[0] != 'string' && typeof stack[0] != 'number') {
           if(stack[0] != undefined && Array.isArray(stack[0])) {
-            stackString = drawVector(stack[0])
+            stackString = drawVectorHTML(stack[0])
           } else if (stack[0] != undefined && Value.typeOf(stack[0]) === 'list') {
             stackString = drawList(stack[0])
           } else if (stack[0] != undefined && Value.isPair(stack[0])) {

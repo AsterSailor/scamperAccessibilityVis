@@ -133,7 +133,7 @@ export function renderToOutput(output: HTMLElement, v: any) {
   output!.appendChild(div)
 }
 
-export function renderToDraw(output: HTMLElement, s: string | undefined) {
+export function renderToDraw(output: HTMLElement, s: any) {
   const div = document.createElement('div')
   div.classList.add('scamper-output')
   div.append(s? s : "undiifi")
