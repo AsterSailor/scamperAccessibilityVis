@@ -830,7 +830,6 @@ export class Sem {
       v = mkCodeElement(v)
     }
     this.traces![this.curStmt]!.appendChild(v)
-    //this.draw()
   }
 
   advance (): void {
@@ -909,7 +908,6 @@ export class Sem {
       if (this.isTracing()) {
         this.appendToCurrentTrace(`Module ${modName} imported`)
       }
-      //this.draw()
       this.advance()
     } else {
       this.advance()
@@ -924,7 +922,6 @@ export class Sem {
       this.appendToCurrentTrace(`Struct ${id} declared`)
       
     }
-    //this.draw()
     this.advance()
   }
 
@@ -944,7 +941,6 @@ export class Sem {
         }
       } catch (e) {
         renderToOutput(this.display, e)
-        //this.draw()
         this.advance()
       }
     } else {
@@ -952,7 +948,6 @@ export class Sem {
         throw new ICE('sem.step', `Stack size is not 1 after execution: ${this.state.stack}`)
       }
       renderToOutput(this.display, valToExp(this.state.stack.pop()))
-      //this.draw()
       this.advance()
     }
   }
@@ -970,11 +965,9 @@ export class Sem {
           this.appendToCurrentTrace(' ')
           this.appendToCurrentTrace(renderToHTML(stateToExp(this.state)!))
           this.appendToCurrentTrace('\n')
-          //this.draw()
         }
       } catch (e) {
         renderToOutput(this.display, e)
-        //this.draw()
         this.advance()
       }
     } else {
@@ -988,9 +981,7 @@ export class Sem {
           maxCallStackDepth = (value as any)['value']
       } else if (this.defaultDisplay) {
         renderToOutput(this.display, valToExp(value))
-        //this.draw()
       }
-      //this.draw()
       this.advance()
     }
   }
@@ -999,10 +990,8 @@ export class Sem {
     let stmt = this.prog[this.curStmt]
     switch (stmt.kind) {
       case 'binding':
-        //this.draw()
         console.log('binding')
         this.stepDefine(stmt.name, stmt.body, stmt.range)
-        //this.draw()
         break
       case 'exp':
         console.log("exp")
@@ -1049,7 +1038,6 @@ export class Sem {
       console.log("draw")
       let stack = envState.getStack()
       if(!stack[0]) {
-      renderToDraw(this.display, "------------------------------~")
       bounded?.forEach(e => {
         //renderToDraw(this.display, e[0])
         let strVal = e[1]?.toString()
@@ -1057,6 +1045,8 @@ export class Sem {
         
         console.log(e[1])
         if(strVal != undefined) {
+          renderToDraw(this.display, "------------------------------~")
+      
           if(typeof e[1] === 'string' && typeof e[0] === 'number' && typeof stack[0] != 'boolean') {
             strVal = strVal
           } else if (e[1] != undefined && Value.typeOf(e[1]) === 'vector') {
@@ -1072,9 +1062,10 @@ export class Sem {
           
          renderToDraw(this.display, e[0] + "  --->  " + strVal)
          //renderToDraw(this.display, HTMLVal)
+         renderToDraw(this.display, "------------------------------^")
         }
       })
-      renderToDraw(this.display, "------------------------------^")
+      
     }
       console.log("we should have the stack")
       console.log(stack)
@@ -1084,6 +1075,7 @@ export class Sem {
       if(stack[0]) {
         stackString = stack[stack.length - 1]?.toString()
         console.log("stack is NOT undefined")
+        console.log(stackString)
         if(typeof stack[0] != 'string' && typeof stack[0] != 'number' && typeof stack[0] != 'boolean') {
           if(stack[0] != undefined && Value.typeOf(stack[0]) === 'vector') {
             stackString = drawVector(stack[0])
@@ -1091,7 +1083,7 @@ export class Sem {
             stackString = drawList(stack[0])
           } else if (stack[0] != undefined && Value.isPair(stack[0])) {
             stackString = drawPair(stack[0])
-          } else {
+          } else if (stack[0] != undefined && Value.isFunction(stack[0])) {
             try {
               console.log(stack[0].name)
               if(stack[0].name === 'cons') {
