@@ -3,7 +3,6 @@ import { Env, Prog, Op, reservedWords, Value, } from './lang.js'
 import { renderToHTML, mkCodeElement, mkSourceBlock, renderToOutput , renderToDraw } from './display.js'
 import * as C from './contract.js'
 import './styles.css'
-import { isFunction } from 'util';
 
 let maxCallStackDepth = 100000;
 
@@ -709,21 +708,27 @@ function drawVector(vector: any[]) {
 function drawVectorHTML(vector: any[]) {
   //Container for html elements
   let div = document.createElement('div');
+  div.ariaLabel = 'object type vector';
+  div.tabIndex = 0;
 
   //loops through the vector, making the visualization pieces for each element
   vector.forEach((e) => {
     //container for all the html elements for one vector element
     const col = document.createElement('div');
-    col.className = 'vector-style'
+    col.className = 'vector-style';
 
     //creates the elements for the box elements of the vector
-    const but = document.createElement('div');
+    const box = document.createElement('div');
     const index = document.createElement('div');
+    const indexVal = vector.indexOf(e).toString();
     index.className = 'index-box';
-    index.textContent = vector.indexOf(e).toString();
+    index.textContent = indexVal;
     col.appendChild(index);
-    but.className = 'vector-box';
-    col.appendChild(but);
+    box.className = 'vector-box';
+    //box.role = 'img'
+    box.tabIndex = 0;
+    box.ariaDescription = `vector index ${indexVal} contains ${'' + e}`
+    col.appendChild(box);
 
     //creates the arrow element for the vector
     for(let i=0; i < vector.length - vector.indexOf(e); i++) {
@@ -783,25 +788,41 @@ function drawList(list: any): any {
 }
 
 function drawListHTML(list: any): any {
+  //declares overall html object to be appended to page
   const div = document.createElement('div');
+  div.ariaDescription = 'object type list';
+  div.tabIndex = 0;
+
   if(list.isList) {
     let len = lengthList(list);
+
+    //loops through the list creating pairs and arrows for each element
     for(let i = 0; i < len!; i++) {
+      //creates the container for the individual list element and the sub element that contains the list pair
       const col = document.createElement('div');
       col.className = 'vector-style';
       const top = document.createElement('div');
       top.className = 'list-style'
 
+      //creates the list pair elements
       for(let j = 0; j < 2; j++) {
         const box = document.createElement('div');
+        box.tabIndex = 0;
+        if(j === 0) {
+          box.ariaDescription = `list pair ${i}, first element contains ${list.fst}`;
+        } else {
+          box.ariaDescription = `list pair ${i}, second element contains a list pair`;
+        }
         if(i === len!-1 && j === 1) {
-          box.className = 'null-box'
+          box.className = 'null-box';
+          box.ariaDescription = `list pair ${i}, second element contains null`;
         } else {
           box.className = 'list-box';
         }
         top.appendChild(box);
       }
 
+      //creates the arrow pointing to the next list element, if there is one
       if(i !== len! - 1) {
         const nextArrow = document.createElement('div');
         nextArrow.className = 'list-arrow';
@@ -813,17 +834,20 @@ function drawListHTML(list: any): any {
       }
       col.appendChild(top);
 
+      //creates the arrow pointing to the contained element
       for(let j = 0; j < len! - i; j++) {
         const arrow = document.createElement('div');
         arrow.className = 'list-arrow-down'
         col.appendChild(arrow);
       }
 
+      //creates the box containing the value in the element
       const val = document.createElement('div');
       val.className = 'val-box';
       val.textContent = '▼\n' + list.fst;
       col.appendChild(val);
       
+      //iterates the list
       list = list.snd;
       div.appendChild(col);
     }
@@ -1144,7 +1168,7 @@ export class Sem {
             strVal = strVal
           } else if (e[1] != undefined && Value.typeOf(e[1]) === 'vector') {
             strVal = drawVector(e[1])
-            //HTMLVal = drawVectorHTML(e[1])
+            HTMLVal = drawVectorHTML(e[1])
           } else if (e[1] != undefined && Value.typeOf(e[1]) === 'list') {
             strVal = drawList(e[1])
             HTMLVal = drawListHTML(e[1])
@@ -1155,7 +1179,7 @@ export class Sem {
           }
           
          renderToDraw(this.display, e[0] + "  --->  " + strVal)
-         //renderToDraw(this.display, HTMLVal)
+         renderToDraw(this.display, HTMLVal)
         }
       })
       renderToDraw(this.display, "------------------------------^")
