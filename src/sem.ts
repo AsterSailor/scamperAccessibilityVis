@@ -698,7 +698,17 @@ function makeTraceHeader (s: Stmt.T): HTMLElement {
 function drawVector(vector: any[]) {
   let str = ''
   vector.forEach(e => {
-    str = str + '[' + e + ']'
+    if(typeof e === 'string' || typeof e === 'number' || typeof e === 'boolean') {
+      str = str + '[' + e + ']'
+    } else if (Value.isPair(e)) {
+      if(e.isList) {
+        str = str + '[' + drawList(e) + ']'
+      } else {
+        str = str + '[' +  drawPair(e) + ']'
+      }
+    } else if (Value.typeOf(e) === 'vector') {
+      str = str + '[' + drawVector(e) + ']'
+    }
   })
 
   return str
@@ -732,6 +742,8 @@ function drawList(list: any): any {
       } else {
         str = str + drawPair(val) + ''
       }
+    } else if (Value.typeOf(val) === 'vector') {
+      str = str + drawVector(val) + ''
     }
     //console.log('str so far: ' + str)
     if(next === null) {
