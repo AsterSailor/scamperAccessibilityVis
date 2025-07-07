@@ -766,16 +766,6 @@ function drawPair(pair: any): any {
   return str
 }
 
-function drawCons(obj: any): any {
-  let str: any = ''
-  if(obj[0].name === 'cons') {
-    str = str + drawCons(obj)
-  } else {
-
-  }
-  
-}
-
 export class Sem {
   display: HTMLElement
   env: Env
