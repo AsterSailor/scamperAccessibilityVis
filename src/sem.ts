@@ -727,7 +727,11 @@ function drawList(list: any): any {
     //  console.log(val)
       str = str + val + ''
     } else if (Value.isPair(val)) {
-      str = str + drawPair(val) + ''
+      if(val.isList) {
+        str = str + drawList(val)
+      } else {
+        str = str + drawPair(val) + ''
+      }
     }
     //console.log('str so far: ' + str)
     if(next === null) {
@@ -851,6 +855,7 @@ export class Sem {
           this.appendToCurrentTrace(' ')
           this.appendToCurrentTrace(renderToHTML(stateToExp(this.state)!))
           this.appendToCurrentTrace('\n')
+          
         }
       } catch (e) {
         renderToOutput(this.display, e)
@@ -871,12 +876,12 @@ export class Sem {
         throw new ScamperError('Runtime', `Identifier "${name}" already bound`, undefined, range)
       } else {
         this.env.set(name, val)
-      }
-      if (this.isTracing()) {
-        this.appendToCurrentTrace(mkCodeElement(`${name} bound`))
         
       }
       this.draw()
+      if (this.isTracing()) {
+        this.appendToCurrentTrace(mkCodeElement(`${name} bound`))
+      }
       this.advance()
     }
   }
@@ -892,7 +897,7 @@ export class Sem {
       if (this.isTracing()) {
         this.appendToCurrentTrace(`Module ${modName} imported`)
       }
-      this.draw()
+      //this.draw()
       this.advance()
     } else {
       this.advance()
@@ -907,7 +912,7 @@ export class Sem {
       this.appendToCurrentTrace(`Struct ${id} declared`)
       
     }
-    this.draw()
+    //this.draw()
     this.advance()
   }
 
@@ -927,7 +932,7 @@ export class Sem {
         }
       } catch (e) {
         renderToOutput(this.display, e)
-        this.draw()
+        //this.draw()
         this.advance()
       }
     } else {
@@ -935,7 +940,7 @@ export class Sem {
         throw new ICE('sem.step', `Stack size is not 1 after execution: ${this.state.stack}`)
       }
       renderToOutput(this.display, valToExp(this.state.stack.pop()))
-      this.draw()
+      //this.draw()
       this.advance()
     }
   }
@@ -957,7 +962,7 @@ export class Sem {
         }
       } catch (e) {
         renderToOutput(this.display, e)
-        this.draw()
+        //this.draw()
         this.advance()
       }
     } else {
@@ -973,7 +978,7 @@ export class Sem {
         renderToOutput(this.display, valToExp(value))
         //this.draw()
       }
-      this.draw()
+      //this.draw()
       this.advance()
     }
   }
@@ -1036,7 +1041,7 @@ export class Sem {
       bounded?.forEach(e => {
         //renderToDraw(this.display, e[0])
         let strVal = e[1]?.toString()
-        let HTMLVal
+        let HTMLVal = ''
         
         console.log(e[1])
         if(strVal != undefined) {
