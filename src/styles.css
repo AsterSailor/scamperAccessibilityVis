@@ -1,4 +1,4 @@
-.list-box {
+.vector-box {
     width: 40px;
     height: 40px;
     padding: 5px;
@@ -7,13 +7,47 @@
     box-sizing: border-box;
 }
 
+.list-style {
+    display: flex;
+}
+
+.list-box {
+    width: 40px;
+    height: 40px;
+    padding: 5px;
+    border: 2px solid black;
+    margin: 0px;
+    box-sizing: border-box;
+    display: inline-block;
+}
+
+.null-box {
+    width: 40px;
+    height: 40px;
+    padding: 5px;
+    background: linear-gradient(to bottom right, transparent calc(50% - 1px), black calc(50% - 1px), black 50%, transparent 50%);
+    border: 2px solid black;
+    margin: 0px;
+    box-sizing: border-box;
+    display: inline-block;
+}
+
 .val-box {
     width: 40px;
     height: 20px;
     padding: 5px;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
     box-sizing: border-box;
     text-align: center;
+}
+
+.arrow-box {
+    width: 15px;
+    height: 20px;
+    padding: 0px;
+    margin-top: 10px;
+    box-sizing: border-box;
+    display: inline-block
 }
 
 .index-box {
@@ -58,15 +92,17 @@
 }
 
 .list-arrow {
-    width: 200px;
-    height: 5px;
-    padding: 2px;
-    margin: 0;
+    width: 30px;
+    height: 2px;
+    border: 2px solid black;
+    margin-bottom: 0px;
+    margin-top: 18px;
     box-sizing: border-box;
+    display: inline-block;
     vertical-align: middle;
 }
 
-.list-arrow:after {
+/* .list-arrow:after {
     content: '';
     display: inline-block;
     width: 0;
@@ -75,4 +111,4 @@
     border-top: 8px solid transparent;
     border-bottom: 8px solid transparent;
     vertical-align: middle;
-}
+} */

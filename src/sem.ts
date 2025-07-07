@@ -721,7 +721,7 @@ function drawVectorHTML(vector: any[]) {
     index.className = 'index-box';
     index.textContent = vector.indexOf(e).toString();
     col.appendChild(index);
-    but.className = 'list-box';
+    but.className = 'vector-box';
     col.appendChild(but);
 
     //creates the arrow element for the vector
@@ -780,13 +780,52 @@ function drawList(list: any): any {
 }
 
 function drawListHTML(list: any): any {
+  const div = document.createElement('div');
   if(list.isList) {
-    let div = document.createElement('div');
     let len = lengthList(list);
     for(let i = 0; i < len!; i++) {
+      const col = document.createElement('div');
+      col.className = 'vector-style';
+      const top = document.createElement('div');
+      top.className = 'list-style'
+
+      for(let j = 0; j < 2; j++) {
+        const box = document.createElement('div');
+        if(i === len!-1 && j === 1) {
+          box.className = 'null-box'
+        } else {
+          box.className = 'list-box';
+        }
+        top.appendChild(box);
+      }
+
+      if(i !== len! - 1) {
+        const nextArrow = document.createElement('div');
+        nextArrow.className = 'list-arrow';
+        const arrowHead = document.createElement('div');
+        arrowHead.className = 'arrow-box'
+        arrowHead.textContent = '▶'
+        top.appendChild(nextArrow);
+        top.appendChild(arrowHead);
+      }
+      col.appendChild(top);
+
+      for(let j = 0; j < len! - i; j++) {
+        const arrow = document.createElement('div');
+        arrow.className = 'list-arrow-down'
+        col.appendChild(arrow);
+      }
+
+      const val = document.createElement('div');
+      val.className = 'val-box';
+      val.textContent = '▼\n' + list.fst;
+      col.appendChild(val);
       
+      list = list.snd;
+      div.appendChild(col);
     }
   }
+  return div;
 }
 
 function drawPair(pair: any): any {
@@ -1089,6 +1128,7 @@ export class Sem {
             HTMLVal = drawVectorHTML(e[1])
           } else if (e[1] != undefined && Value.typeOf(e[1]) === 'list') {
             strVal = drawList(e[1])
+            HTMLVal = drawListHTML(e[1])
           } else if (e[1] != undefined && Value.isPair(e[1])) {
             strVal = drawPair(e[1])
           } else {
