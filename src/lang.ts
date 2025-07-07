@@ -402,19 +402,7 @@ export class Env {
     return ret 
   }
 
-  static vectorToPrint(bound: [Id, Value.T]): string {
-    let str = ""
-    
-    
-    return str
-  }
-
   public toString2(libNum: number) {
-    let s = ""
-    let values = this.bindings.values()
-    let strings = this.bindings.keys()
-    // let cloned = this.clone()
-    // const iterator1 = this.bindings[Symbol.iterator]();
     const iterator1 = this.bindings[Symbol.iterator]();
 
     let bounds: [Id, Value.T][] = []

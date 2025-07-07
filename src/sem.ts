@@ -2,6 +2,7 @@ import { ICE, Id, Library, Range, ScamperError, Stmt } from './lang.js'
 import { Env, Prog, Op, reservedWords, Value, } from './lang.js'
 import { renderToHTML, mkCodeElement, mkSourceBlock, renderToOutput , renderToDraw } from './display.js'
 import * as C from './contract.js'
+import { isFunction } from 'util';
 
 let maxCallStackDepth = 100000;
 
@@ -717,7 +718,7 @@ function drawVectorHTML(vector: any[]) {
 
 function drawList(list: any): any {
   //console.log('in func')
-  if(list.isList === true) {
+  if(list.isList) {
     //console.log('found true')
     let str = '{ '
     let val = list.fst
@@ -726,6 +727,8 @@ function drawList(list: any): any {
     if(typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean') {
     //  console.log(val)
       str = str + val + ''
+    } else if (Value.isPair(val)) {
+      str = str + drawPair(val) + ''
     }
     //console.log('str so far: ' + str)
     if(next === null) {
@@ -747,14 +750,31 @@ function drawPair(pair: any): any {
   if(typeof fst === 'string' || typeof fst === 'number' || typeof fst === 'boolean') {
     console.log(fst)
     str = str + '{ ' + fst
+  } else if(Value.isPair(fst)) {
+    str = str + drawPair(fst) + ' }'
+  } else if(Value.typeOf(fst) === 'list') {
+    str = str + drawList(fst) + ' }'
   }
-  str = str + ' }{ '
-  if(typeof fst === 'string' || typeof fst === 'number' || typeof fst === 'boolean') {
+  str = str + ' }-{ '
+  if(typeof snd === 'string' || typeof snd === 'number' || typeof snd === 'boolean') {
     console.log(snd)
     str = str + snd + ' }'
+  } else if(Value.isPair(snd)) {
+    str = str + drawPair(snd) + ' }'
+  } else if(Value.typeOf(snd) === 'list') {
+    str = str + drawList(snd) + ' }'
   }
-  console.log(str)
   return str
+}
+
+function drawCons(obj: any): any {
+  let str: any = ''
+  if(obj[0].name === 'cons') {
+    str = str + drawCons(obj)
+  } else {
+
+  }
+  
 }
 
 export class Sem {
@@ -1026,17 +1046,16 @@ export class Sem {
       renderToDraw(this.display, "------------------------------~")
       bounded?.forEach(e => {
         //renderToDraw(this.display, e[0])
-        
         let strVal = e[1]?.toString()
         let HTMLVal
         
         console.log(e[1])
         if(strVal != undefined) {
-          if(typeof e[1] === 'string' && typeof e[0] === 'number') {
+          if(typeof e[1] === 'string' && typeof e[0] === 'number' && typeof stack[0] != 'boolean') {
             strVal = strVal
-          } else if (e[1] != undefined && Array.isArray(e[1])) {
+          } else if (e[1] != undefined && Value.typeOf(e[1]) === 'vector') {
             strVal = drawVector(e[1])
-            HTMLVal = drawVectorHTML(e[1])
+            //HTMLVal = drawVectorHTML(e[1])
           } else if (e[1] != undefined && Value.typeOf(e[1]) === 'list') {
             strVal = drawList(e[1])
           } else if (e[1] != undefined && Value.isPair(e[1])) {
@@ -1046,39 +1065,49 @@ export class Sem {
           }
           
          renderToDraw(this.display, e[0] + "  --->  " + strVal)
-         renderToDraw(this.display, HTMLVal)
+         //renderToDraw(this.display, HTMLVal)
         }
       })
       renderToDraw(this.display, "------------------------------^")
     }
       console.log("we should have the stack")
       console.log(stack)
-      //renderToDraw(this.display, e[0])
       
-      // if(e[1] === 'vector') {
-      //   let vec = this.env.get(e[0])
-      //   for(let i = 0; i < vec.length; i+)
-      //   strVal.concat()
-      // }
       let stackString;
       console.log("this is stack[0]" + stack[0])
       if(stack[0]) {
         stackString = stack[stack.length - 1]?.toString()
         console.log("stack is NOT undefined")
-        if(typeof stack[0] != 'string' && typeof stack[0] != 'number') {
-          if(stack[0] != undefined && Array.isArray(stack[0])) {
-            stackString = drawVectorHTML(stack[0])
+        if(typeof stack[0] != 'string' && typeof stack[0] != 'number' && typeof stack[0] != 'boolean') {
+          if(stack[0] != undefined && Value.typeOf(stack[0]) === 'vector') {
+            stackString = drawVector(stack[0])
           } else if (stack[0] != undefined && Value.typeOf(stack[0]) === 'list') {
             stackString = drawList(stack[0])
           } else if (stack[0] != undefined && Value.isPair(stack[0])) {
             stackString = drawPair(stack[0])
+          } else {
+            try {
+              console.log(stack[0].name)
+              if(stack[0].name === 'cons') {
+                let last: any = stack[stack.length - 1]
+                console.log(last.snd)
+                if(last.snd === null) {
+                  stackString = drawList(Value.mkList(last.fst))
+                } else if(last.snd.isList) {
+                  stackString = drawList(Value.mkPair(last.fst, last.snd))
+                } else {
+                  stackString = drawPair(Value.mkPair(last.fst, last.snd))
+                }
+              }
+            } catch {
+              console.log("NAME")
+            }
           }
         }
-        renderToDraw(this.display,  "---> " + stackString)
-      }
-      console.log("stack is undefined")
+        renderToDraw(this.display,  "--> " + stackString)
+      } else {console.log("stack is undefined")}
       
     }
-    console.log("outside undifiii")
+    //console.log("outside undifiii")
   }
 }
