@@ -2,7 +2,6 @@ import { ICE, Id, Library, Range, ScamperError, Stmt } from './lang.js'
 import { Env, Prog, Op, reservedWords, Value, } from './lang.js'
 import { renderToHTML, mkCodeElement, mkSourceBlock, renderToOutput , renderToDraw } from './display.js'
 import * as C from './contract.js'
-import { isFunction } from 'util';
 
 let maxCallStackDepth = 100000;
 
@@ -1104,7 +1103,7 @@ export class Sem {
             }
           }
         }
-        renderToDraw(this.display,  "--> " + stackString)
+        renderToDraw(this.display,  ">>> " + stackString)
       } else {console.log("stack is undefined")}
       
     }
