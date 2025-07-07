@@ -166,9 +166,9 @@ class IDE {
     astTextButton.addEventListener('click', () => {
       this.showASTText()
     })
-    drawButton.addEventListener('click', () => {
-      this.scamper!.drawVis()
-    })
+    // drawButton.addEventListener('click', () => {
+    //   this.scamper!.drawVis()
+    // })
     astWindowButton.addEventListener('click', () => {
       this.saveCurrentFile()
       const params = new URLSearchParams({filename: this.currentFile, isTree: "true"})

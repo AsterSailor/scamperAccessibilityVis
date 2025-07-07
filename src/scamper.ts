@@ -68,7 +68,7 @@ export class Scamper {
 
   }
   stepStmtProgram () { this.sem.stepToNextStmt() }
-  drawVis () {console.log("dV"); this.sem.draw() }
+ // drawVis () {console.log("dV"); this.sem.draw() }
 }
 
 export default Scamper
