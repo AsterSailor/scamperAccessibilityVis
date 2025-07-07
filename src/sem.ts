@@ -699,7 +699,17 @@ function makeTraceHeader (s: Stmt.T): HTMLElement {
 function drawVector(vector: any[]) {
   let str = ''
   vector.forEach(e => {
-    str = str + '[' + e + ']'
+    if(typeof e === 'string' || typeof e === 'number' || typeof e === 'boolean') {
+      str = str + '[' + e + ']'
+    } else if (Value.isPair(e)) {
+      if(e.isList) {
+        str = str + '[' + drawList(e) + ']'
+      } else {
+        str = str + '[' +  drawPair(e) + ']'
+      }
+    } else if (Value.typeOf(e) === 'vector') {
+      str = str + '[' + drawVector(e) + ']'
+    }
   })
 
   return str
@@ -773,7 +783,13 @@ function drawList(list: any): any {
     //  console.log(val)
       str = str + val + ''
     } else if (Value.isPair(val)) {
-      str = str + drawPair(val) + ''
+      if(val.isList) {
+        str = str + drawList(val)
+      } else {
+        str = str + drawPair(val) + ''
+      }
+    } else if (Value.typeOf(val) === 'vector') {
+      str = str + drawVector(val) + ''
     }
     //console.log('str so far: ' + str)
     if(next === null) {
@@ -880,16 +896,6 @@ function drawPair(pair: any): any {
   return str
 }
 
-function drawCons(obj: any): any {
-  let str: any = ''
-  if(obj[0].name === 'cons') {
-    str = str + drawCons(obj)
-  } else {
-
-  }
-  
-}
-
 export class Sem {
   display: HTMLElement
   env: Env
@@ -938,7 +944,6 @@ export class Sem {
       v = mkCodeElement(v)
     }
     this.traces![this.curStmt]!.appendChild(v)
-    //this.draw()
   }
 
   advance (): void {
@@ -975,6 +980,7 @@ export class Sem {
           this.appendToCurrentTrace(' ')
           this.appendToCurrentTrace(renderToHTML(stateToExp(this.state)!))
           this.appendToCurrentTrace('\n')
+          
         }
       } catch (e) {
         renderToOutput(this.display, e)
@@ -995,12 +1001,12 @@ export class Sem {
         throw new ScamperError('Runtime', `Identifier "${name}" already bound`, undefined, range)
       } else {
         this.env.set(name, val)
-      }
-      if (this.isTracing()) {
-        this.appendToCurrentTrace(mkCodeElement(`${name} bound`))
         
       }
       this.draw()
+      if (this.isTracing()) {
+        this.appendToCurrentTrace(mkCodeElement(`${name} bound`))
+      }
       this.advance()
     }
   }
@@ -1016,7 +1022,6 @@ export class Sem {
       if (this.isTracing()) {
         this.appendToCurrentTrace(`Module ${modName} imported`)
       }
-      this.draw()
       this.advance()
     } else {
       this.advance()
@@ -1031,7 +1036,6 @@ export class Sem {
       this.appendToCurrentTrace(`Struct ${id} declared`)
       
     }
-    this.draw()
     this.advance()
   }
 
@@ -1051,7 +1055,6 @@ export class Sem {
         }
       } catch (e) {
         renderToOutput(this.display, e)
-        this.draw()
         this.advance()
       }
     } else {
@@ -1059,7 +1062,6 @@ export class Sem {
         throw new ICE('sem.step', `Stack size is not 1 after execution: ${this.state.stack}`)
       }
       renderToOutput(this.display, valToExp(this.state.stack.pop()))
-      this.draw()
       this.advance()
     }
   }
@@ -1077,11 +1079,9 @@ export class Sem {
           this.appendToCurrentTrace(' ')
           this.appendToCurrentTrace(renderToHTML(stateToExp(this.state)!))
           this.appendToCurrentTrace('\n')
-          //this.draw()
         }
       } catch (e) {
         renderToOutput(this.display, e)
-        this.draw()
         this.advance()
       }
     } else {
@@ -1095,9 +1095,7 @@ export class Sem {
           maxCallStackDepth = (value as any)['value']
       } else if (this.defaultDisplay) {
         renderToOutput(this.display, valToExp(value))
-        //this.draw()
       }
-      this.draw()
       this.advance()
     }
   }
@@ -1106,10 +1104,8 @@ export class Sem {
     let stmt = this.prog[this.curStmt]
     switch (stmt.kind) {
       case 'binding':
-        //this.draw()
         console.log('binding')
         this.stepDefine(stmt.name, stmt.body, stmt.range)
-        //this.draw()
         break
       case 'exp':
         console.log("exp")
@@ -1156,14 +1152,15 @@ export class Sem {
       console.log("draw")
       let stack = envState.getStack()
       if(!stack[0]) {
-      renderToDraw(this.display, "------------------------------~")
       bounded?.forEach(e => {
         //renderToDraw(this.display, e[0])
         let strVal = e[1]?.toString()
-        let HTMLVal
+        let HTMLVal = ''
         
         console.log(e[1])
         if(strVal != undefined) {
+          renderToDraw(this.display, "------------------------------~")
+      
           if(typeof e[1] === 'string' && typeof e[0] === 'number' && typeof stack[0] != 'boolean') {
             strVal = strVal
           } else if (e[1] != undefined && Value.typeOf(e[1]) === 'vector') {
@@ -1180,9 +1177,10 @@ export class Sem {
           
          renderToDraw(this.display, e[0] + "  --->  " + strVal)
          renderToDraw(this.display, HTMLVal)
+         renderToDraw(this.display, "------------------------------^")
         }
       })
-      renderToDraw(this.display, "------------------------------^")
+      
     }
       console.log("we should have the stack")
       console.log(stack)
@@ -1192,6 +1190,7 @@ export class Sem {
       if(stack[0]) {
         stackString = stack[stack.length - 1]?.toString()
         console.log("stack is NOT undefined")
+        console.log(stackString)
         if(typeof stack[0] != 'string' && typeof stack[0] != 'number' && typeof stack[0] != 'boolean') {
           if(stack[0] != undefined && Value.typeOf(stack[0]) === 'vector') {
             stackString = drawVector(stack[0])
@@ -1199,7 +1198,7 @@ export class Sem {
             stackString = drawList(stack[0])
           } else if (stack[0] != undefined && Value.isPair(stack[0])) {
             stackString = drawPair(stack[0])
-          } else {
+          } else if (stack[0] != undefined && Value.isFunction(stack[0])) {
             try {
               console.log(stack[0].name)
               if(stack[0].name === 'cons') {
@@ -1218,7 +1217,7 @@ export class Sem {
             }
           }
         }
-        renderToDraw(this.display,  "--> " + stackString)
+        renderToDraw(this.display,  ">>> " + stackString)
       } else {console.log("stack is undefined")}
       
     }
