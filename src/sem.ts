@@ -2,6 +2,7 @@ import { ICE, Id, Library, Range, ScamperError, Stmt } from './lang.js'
 import { Env, Prog, Op, reservedWords, Value, } from './lang.js'
 import { renderToHTML, mkCodeElement, mkSourceBlock, renderToOutput , renderToDraw } from './display.js'
 import * as C from './contract.js'
+import './styles.css'
 
 let maxCallStackDepth = 100000;
 
@@ -705,14 +706,53 @@ function drawVector(vector: any[]) {
 }
 
 function drawVectorHTML(vector: any[]) {
-  let div = document.createElement('div')
-  vector.forEach(e => {
-    let but = document.createElement('button')
-    but.textContent = e + ''
-    div.appendChild(but)
+  //Container for html elements
+  let div = document.createElement('div');
+
+  //loops through the vector, making the visualization pieces for each element
+  vector.forEach((e) => {
+    //container for all the html elements for one vector element
+    const col = document.createElement('div');
+    col.className = 'vector-style'
+
+    //creates the elements for the box elements of the vector
+    const but = document.createElement('div');
+    const index = document.createElement('div');
+    index.className = 'index-box';
+    index.textContent = vector.indexOf(e).toString();
+    col.appendChild(index);
+    but.className = 'list-box';
+    col.appendChild(but);
+
+    //creates the arrow element for the vector
+    for(let i=0; i < vector.length - vector.indexOf(e); i++) {
+      const arrow = document.createElement('div');
+      arrow.className = 'vec-arrow'
+      col.appendChild(arrow);
+    }
+
+    //creates the value element for the vector
+    const val = document.createElement('div');
+    val.className = 'val-box'
+    val.textContent = '▽\n' + e;
+    col.appendChild(val);
+
+    //appends a fully constructed vector element to the overall vector container
+    div.appendChild(col);
   })
 
   return div
+}
+
+function lengthList(lst: any, count: number = 0) {
+  if(lst.isList) {
+    if(lst.snd === null) {
+      return count + 1
+    } else {
+      count = count + 1
+      return lengthList(lst.snd, count)
+    }
+  }
 }
 
 function drawList(list: any): any {
@@ -736,6 +776,16 @@ function drawList(list: any): any {
       return str = str + ' }{ -}-> ' + drawList(next)
     }
     
+  }
+}
+
+function drawListHTML(list: any): any {
+  if(list.isList) {
+    let div = document.createElement('div');
+    let len = lengthList(list);
+    for(let i = 0; i < len!; i++) {
+      
+    }
   }
 }
 
