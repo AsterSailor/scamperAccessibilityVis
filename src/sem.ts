@@ -1180,7 +1180,7 @@ export class Sem {
               }
               
             renderToDraw(this.display, e[0] + "  --->  " + strVal)
-            //renderToDraw(this.display, HTMLVal)
+            renderToDraw(this.display, HTMLVal)
           
             }
           })
@@ -1191,6 +1191,7 @@ export class Sem {
       console.log(stack)
       
       let stackString;
+      let stackHTML;
       console.log("this is stack[0]" + stack[0])
       if(stack[0]) {
         stackString = stack[stack.length - 1]?.toString()
@@ -1199,8 +1200,10 @@ export class Sem {
         if(typeof stack[0] != 'string' && typeof stack[0] != 'number' && typeof stack[0] != 'boolean') {
           if(stack[0] != undefined && Value.typeOf(stack[0]) === 'vector') {
             stackString = drawVector(stack[0])
+            stackHTML = drawVectorHTML(stack[0])
           } else if (stack[0] != undefined && Value.typeOf(stack[0]) === 'list') {
             stackString = drawList(stack[0])
+            stackHTML = drawListHTML(stack[0])
           } else if (stack[0] != undefined && Value.isPair(stack[0])) {
             stackString = drawPair(stack[0])
           } else if (stack[0] != undefined && Value.isFunction(stack[0])) {
@@ -1210,8 +1213,10 @@ export class Sem {
                 console.log(last.snd)
                 if(last.snd === null) {
                   stackString = drawList(Value.mkList(last.fst))
+                  stackHTML = drawListHTML(Value.mkList(last.fst))
                 } else if(last.snd.isList) {
                   stackString = drawList(Value.mkPair(last.fst, last.snd))
+                  stackHTML = drawListHTML(Value.mkPair(last.fst, last.snd))
                 } else {
                   stackString = drawPair(Value.mkPair(last.fst, last.snd))
                 }
@@ -1223,6 +1228,7 @@ export class Sem {
           }
         }
         renderToDraw(this.display,  ">>> " + stackString)
+        renderToDraw(this.display, stackHTML)
       } else {console.log("stack is undefined")}
       
     }
