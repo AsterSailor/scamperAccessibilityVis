@@ -696,9 +696,9 @@ function makeTraceHeader (s: Stmt.T): HTMLElement {
   }
 }
 
-function drawVector(vector: any[]) {
+function drawVector(vector: any): any {
   let str = ''
-  vector.forEach(e => {
+  vector.forEach((e: any) => {
     if(typeof e === 'string' || typeof e === 'number' || typeof e === 'boolean') {
       str = str + '[' + e + ']'
     } else if (Value.isPair(e)) {
@@ -715,14 +715,14 @@ function drawVector(vector: any[]) {
   return str
 }
 
-function drawVectorHTML(vector: any[]) {
+function drawVectorHTML(vector: any): any {
   //Container for html elements
   let div = document.createElement('div');
   div.ariaLabel = 'object type vector';
   div.tabIndex = 0;
 
   //loops through the vector, making the visualization pieces for each element
-  vector.forEach((e) => {
+  vector.forEach((e: any) => {
     //container for all the html elements for one vector element
     const col = document.createElement('div');
     col.className = 'vector-style';
@@ -1152,36 +1152,41 @@ export class Sem {
       console.log("draw")
       let stack = envState.getStack()
       if(!stack[0]) {
-      bounded?.forEach(e => {
-        //renderToDraw(this.display, e[0])
-        let strVal = e[1]?.toString()
-        let HTMLVal = ''
-        
-        console.log(e[1])
-        if(strVal != undefined) {
+        if(bounded != undefined && bounded.length > 0) {      
           renderToDraw(this.display, "------------------------------~")
-      
-          if(typeof e[1] === 'string' && typeof e[0] === 'number' && typeof stack[0] != 'boolean') {
-            strVal = strVal
-          } else if (e[1] != undefined && Value.typeOf(e[1]) === 'vector') {
-            strVal = drawVector(e[1])
-            HTMLVal = drawVectorHTML(e[1])
-          } else if (e[1] != undefined && Value.typeOf(e[1]) === 'list') {
-            strVal = drawList(e[1])
-            HTMLVal = drawListHTML(e[1])
-          } else if (e[1] != undefined && Value.isPair(e[1])) {
-            strVal = drawPair(e[1])
-          } else {
-            strVal
-          }
+          bounded?.forEach(e => {
+            //renderToDraw(this.display, e[0])
+            let strVal: any = e[1]?.toString()
+            let HTMLVal: any = ''
+            console.log("e[1]")
+            console.log(e[1])
+            if(strVal != undefined) {
+              
           
-         renderToDraw(this.display, e[0] + "  --->  " + strVal)
-         renderToDraw(this.display, HTMLVal)
-         renderToDraw(this.display, "------------------------------^")
+              if(typeof e[1] === 'string' && typeof e[0] === 'number' && typeof stack[0] != 'boolean') {
+                strVal = strVal
+              } else if (e[1] != undefined && Value.typeOf(e[1]) === 'vector') {
+                strVal = drawVector(e[1])
+                HTMLVal = drawVectorHTML(e[1])
+              } else if (e[1] != undefined && Value.typeOf(e[1]) === 'list') {
+                strVal = drawList(e[1])
+                HTMLVal = drawListHTML(e[1])
+              } else if (e[1] != undefined && Value.isPair(e[1])) {
+                strVal = drawPair(e[1])
+              } else if (e[1] != undefined && Value.isFunction(e[1])) {
+                strVal = ("PROCEDURE")
+              } else {
+                strVal
+              }
+              
+            renderToDraw(this.display, e[0] + "  --->  " + strVal)
+            //renderToDraw(this.display, HTMLVal)
+          
+            }
+          })
+          renderToDraw(this.display, "------------------------------^")
         }
-      })
-      
-    }
+      }
       console.log("we should have the stack")
       console.log(stack)
       
@@ -1199,8 +1204,7 @@ export class Sem {
           } else if (stack[0] != undefined && Value.isPair(stack[0])) {
             stackString = drawPair(stack[0])
           } else if (stack[0] != undefined && Value.isFunction(stack[0])) {
-            try {
-              console.log(stack[0].name)
+            if(stack[0].name) {
               if(stack[0].name === 'cons') {
                 let last: any = stack[stack.length - 1]
                 console.log(last.snd)
@@ -1212,9 +1216,10 @@ export class Sem {
                   stackString = drawPair(Value.mkPair(last.fst, last.snd))
                 }
               }
-            } catch {
-              console.log("NAME")
+            } else {
+              stackString = ("PROCEDURE")
             }
+            
           }
         }
         renderToDraw(this.display,  ">>> " + stackString)
