@@ -7,6 +7,7 @@ import Prelude from './lib/prelude.js'
 
 export type ScamperOptions = {
   isTracing: boolean
+  isDrawing: boolean
   isPrintingCode: boolean
   initialEnv?: Env
   defaultDisplay: boolean
@@ -15,6 +16,7 @@ export type ScamperOptions = {
 export function mkOptions(): ScamperOptions {
   return {
     isTracing: false,
+    isDrawing: false,
     isPrintingCode: false,
     initialEnv: undefined,
     defaultDisplay: true
@@ -47,6 +49,7 @@ export class Scamper {
       builtinLibs,
       // TODO: probably should just pass opts through...
       opts.isTracing,
+      opts.isDrawing,
       opts.defaultDisplay,
       opts.isPrintingCode,
       this.env,
@@ -62,10 +65,11 @@ export class Scamper {
     this.parseroutput.ast.renderTree(this.display, this.parseroutput.ast.nodes);
   }
 
-  stepProgram () { //console.log("stepper"); 
-    this.sem.draw(); 
-    this.sem.step(); //console.log("dV"); this.sem.draw() 
-
+  stepProgram () {
+    if(this.sem.isDrawing) {
+      this.sem.draw();
+    }
+    this.sem.step();
   }
   stepStmtProgram () { this.sem.stepToNextStmt() }
  // drawVis () {console.log("dV"); this.sem.draw() }

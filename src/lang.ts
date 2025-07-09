@@ -409,11 +409,9 @@ export class Env {
     let count = -7
     for (const item of iterator1) {
       if(count > libNum) {
-        //console.log(item)
         bounds.push(item)
       }
       count += 1;
-      //console.log(libNum)
     }
 
     return bounds
