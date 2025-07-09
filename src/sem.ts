@@ -735,6 +735,7 @@ function drawVectorHTML(vector: any): any {
     //box.role = 'img'
     box.tabIndex = 0;
     box.ariaDescription = `vector index ${indexVal} contains ${'' + e}`
+    box.ariaLabel = `vector index ${indexVal} contains ${'' + e}`
     col.appendChild(box);
 
     //creates the arrow element for the vector
@@ -823,12 +824,15 @@ function drawListHTML(list: any): any {
         box.tabIndex = 0;
         if(j === 0) {
           box.ariaDescription = `list pair ${i}, first element contains ${list.fst}`;
+          box.ariaLabel = `list pair ${i}, first element contains ${list.fst}`;
         } else {
           box.ariaDescription = `list pair ${i}, second element contains a list pair`;
+          box.ariaLabel = `list pair ${i}, second element contains a list pair`;
         }
         if(i === len!-1 && j === 1) {
           box.className = 'null-box';
           box.ariaDescription = `list pair ${i}, second element contains null`;
+          box.ariaLabel = `list pair ${i}, second element contains null`;
         } else {
           box.className = 'list-box';
         }
