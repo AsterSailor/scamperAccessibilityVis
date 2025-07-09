@@ -3,6 +3,7 @@ import { Env, Prog, Op, reservedWords, Value, } from './lang.js'
 import { renderToHTML, mkCodeElement, mkSourceBlock, renderToOutput , renderToDraw } from './display.js'
 import * as C from './contract.js'
 import './styles.css'
+import { makeList } from './docs/api/prelude.js'
 
 let maxCallStackDepth = 100000;
 
@@ -89,10 +90,6 @@ class ExecutionState {
   public getStack() {
     return this.stack
   }
-  // public toStringStack(): string | undefined {
-    
-  //   return this.stack
-  // }
 }
 
 ///// Raising (ops to values) //////////////////////////////////////////////////
@@ -696,9 +693,9 @@ function makeTraceHeader (s: Stmt.T): HTMLElement {
   }
 }
 
-function drawVector(vector: any[]) {
+function drawVector(vector: any): any {
   let str = ''
-  vector.forEach(e => {
+  vector.forEach((e: any) => {
     if(typeof e === 'string' || typeof e === 'number' || typeof e === 'boolean') {
       str = str + '[' + e + ']'
     } else if (Value.isPair(e)) {
@@ -715,14 +712,14 @@ function drawVector(vector: any[]) {
   return str
 }
 
-function drawVectorHTML(vector: any[]) {
+function drawVectorHTML(vector: any): any {
   //Container for html elements
   let div = document.createElement('div');
   div.ariaLabel = 'object type vector';
   div.tabIndex = 0;
 
   //loops through the vector, making the visualization pieces for each element
-  vector.forEach((e) => {
+  vector.forEach((e: any) => {
     //container for all the html elements for one vector element
     const col = document.createElement('div');
     col.className = 'vector-style';
@@ -936,9 +933,7 @@ function drawPair(pair: any): any {
   let str = ''
   let fst = pair.fst
   let snd = pair.snd
-  console.log("pair")
   if(typeof fst === 'string' || typeof fst === 'number' || typeof fst === 'boolean') {
-    console.log(fst)
     str = str + '{ ' + fst
   } else if(Value.isPair(fst)) {
     str = str + drawPair(fst) + ' }'
@@ -947,7 +942,6 @@ function drawPair(pair: any): any {
   }
   str = str + ' }-{ '
   if(typeof snd === 'string' || typeof snd === 'number' || typeof snd === 'boolean') {
-    console.log(snd)
     str = str + snd + ' }'
   } else if(Value.isPair(snd)) {
     str = str + drawPair(snd) + ' }'
@@ -968,10 +962,12 @@ export class Sem {
   traces?: HTMLElement[]
   defaultDisplay: boolean
   isPrintingCode: boolean
+  isDrawing: boolean
 
   constructor (display: HTMLElement,
                builtinLibs: Map<Id, Library>,
                isTracing: boolean,
+               isDrawing: boolean,
                defaultDisplay: boolean,
                isPrintingCode: boolean,
                env: Env,
@@ -979,7 +975,8 @@ export class Sem {
                src: string) {
     this.display = display
     this.builtinLibs = builtinLibs
-    if (isTracing) {
+    this.isDrawing = isDrawing
+    if (isTracing || isDrawing) {
       this.traces = new Array(prog.length)
       for (let i = 0; i < prog.length; i++) {
         this.traces[i] = makeTraceDiv()
@@ -1000,6 +997,7 @@ export class Sem {
 
   isFinished (): boolean { return this.curStmt === this.prog.length }
   isTracing (): boolean { return this.traces !== undefined }
+  //isDrawing(): boolean { return this}
   appendToCurrentTrace (v: HTMLElement | string): void {
     if (typeof v === 'string') {
       v = mkCodeElement(v)
@@ -1046,7 +1044,7 @@ export class Sem {
       } catch (e) {
         renderToOutput(this.display, e)
         this.advance()
-        this.draw()
+        if(this.isDrawing) {this.draw()}
       }
     } else {
       if (this.state.stack.length !== 1) {
@@ -1064,7 +1062,9 @@ export class Sem {
         this.env.set(name, val)
         
       }
-      this.draw()
+      if(this.isDrawing) {
+        this.draw()
+      }
       if (this.isTracing()) {
         this.appendToCurrentTrace(mkCodeElement(`${name} bound`))
       }
@@ -1165,11 +1165,9 @@ export class Sem {
     let stmt = this.prog[this.curStmt]
     switch (stmt.kind) {
       case 'binding':
-        console.log('binding')
         this.stepDefine(stmt.name, stmt.body, stmt.range)
         break
       case 'exp':
-        console.log("exp")
         this.stepExp(stmt.body)
         break
       case 'import':
@@ -1204,84 +1202,90 @@ export class Sem {
   draw (): void {
     let envState = this.state
     let initialLibNum = 0
-    console.log("here4")
+
     this.builtinLibs.forEach(l => {
       initialLibNum += l.lib.length
     })
+
     if(envState != undefined){
       let bounded = envState.getBoundsEnv(initialLibNum)
-      console.log("draw")
       let stack = envState.getStack()
+
       if(!stack[0]) {
-      bounded?.forEach(e => {
-        //renderToDraw(this.display, e[0])
-        let strVal = e[1]?.toString()
-        let HTMLVal = ''
-        
-        console.log(e[1])
-        if(strVal != undefined) {
+        if(bounded != undefined && bounded.length > 0) {
           renderToDraw(this.display, "------------------------------~")
-      
-          if(typeof e[1] === 'string' && typeof e[0] === 'number' && typeof stack[0] != 'boolean') {
-            strVal = strVal
-          } else if (e[1] != undefined && Value.typeOf(e[1]) === 'vector') {
-            strVal = drawVector(e[1])
-            HTMLVal = drawVectorHTML(e[1])
-          } else if (e[1] != undefined && Value.typeOf(e[1]) === 'list') {
-            strVal = drawList(e[1])
-            HTMLVal = drawListHTML(e[1])
-          } else if (e[1] != undefined && Value.isPair(e[1])) {
-            strVal = drawPair(e[1])
-          } else {
-            strVal
-          }
-          
-         renderToDraw(this.display, e[0] + "  --->  " + strVal)
-         renderToDraw(this.display, HTMLVal)
-         renderToDraw(this.display, "------------------------------^")
+
+          bounded?.forEach(e => {
+            let strVal: any = e[1]?.toString()
+            let HTMLVal: any = ''
+
+            if(strVal != undefined) {
+              if(typeof e[1] === 'string' && typeof e[0] === 'number' && typeof stack[0] != 'boolean') {
+                strVal = strVal
+                HTMLVal = '-'
+              } else if (e[1] != undefined && Value.typeOf(e[1]) === 'vector') {
+                strVal = drawVector(e[1])
+                HTMLVal = drawVectorHTML(e[1])
+              } else if (e[1] != undefined && Value.typeOf(e[1]) === 'list') {
+                strVal = drawList(e[1])
+                HTMLVal = drawListHTML(e[1])
+              } else if (e[1] != undefined && Value.isPair(e[1])) {
+                strVal = drawPair(e[1])
+              } else if (e[1] != undefined && Value.isFunction(e[1])) {
+                strVal = ("PROCEDURE")
+              } else {
+                strVal
+              }
+              
+            renderToDraw(this.display, e[0] + "  --->  " + strVal)
+            renderToDraw(this.display, HTMLVal)
+            }
+          })
+          renderToDraw(this.display, "------------------------------^")
         }
-      })
-      
-    }
-      console.log("we should have the stack")
-      console.log(stack)
-      
+      }
+
       let stackString;
-      console.log("this is stack[0]" + stack[0])
+      let stackHTML;
+
       if(stack[0]) {
         stackString = stack[stack.length - 1]?.toString()
-        console.log("stack is NOT undefined")
+        console.log(stack[0])
         console.log(stackString)
         if(typeof stack[0] != 'string' && typeof stack[0] != 'number' && typeof stack[0] != 'boolean') {
           if(stack[0] != undefined && Value.typeOf(stack[0]) === 'vector') {
             stackString = drawVector(stack[0])
+            stackHTML = drawVectorHTML(stack[0])
           } else if (stack[0] != undefined && Value.typeOf(stack[0]) === 'list') {
             stackString = drawList(stack[0])
+            stackHTML = drawListHTML(stack[0])
           } else if (stack[0] != undefined && Value.isPair(stack[0])) {
             stackString = drawPair(stack[0])
           } else if (stack[0] != undefined && Value.isFunction(stack[0])) {
-            try {
-              console.log(stack[0].name)
+            if(stack[0].name) {
               if(stack[0].name === 'cons') {
                 let last: any = stack[stack.length - 1]
-                console.log(last.snd)
                 if(last.snd === null) {
                   stackString = drawList(Value.mkList(last.fst))
+                  stackHTML = drawListHTML(Value.mkList(last.fst))
                 } else if(last.snd.isList) {
                   stackString = drawList(Value.mkPair(last.fst, last.snd))
+                  stackHTML = drawListHTML(Value.mkPair(last.fst, last.snd))
                 } else {
                   stackString = drawPair(Value.mkPair(last.fst, last.snd))
                 }
+              } else if(stack[0].name === 'map') {
+                //forEachstack.push(Value.mkList)
+                console.log("mapping")
               }
-            } catch {
-              console.log("NAME")
+            } else {
+              stackString = ("PROCEDURE")
             }
           }
         }
         renderToDraw(this.display,  ">>> " + stackString)
-      } else {console.log("stack is undefined")}
-      
+        renderToDraw(this.display, stackHTML)
+      }
     }
-    //console.log("outside undifiii")
   }
 }

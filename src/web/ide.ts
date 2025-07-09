@@ -33,13 +33,14 @@ class IDE {
   scamper?: Scamper
   isDirty: boolean
 
-  startScamper (isTracing: boolean): void {
+  startScamper (isTracing: boolean, isDrawing: boolean): void {
     outputPane!.innerHTML = ''
     const opts = mkOptions()
     opts.isTracing = isTracing
+    opts.isDrawing = isDrawing
     try {
       this.scamper = new Scamper(outputPane, this.getDoc(), opts)
-      if (isTracing) {
+      if (isTracing || isDrawing) {
         stepOnceButton.disabled = false
         stepStmtButton.disabled = false
         stepAllButton.disabled = false
@@ -142,7 +143,7 @@ class IDE {
     }
 
     runButton.addEventListener('click', () => {
-      this.startScamper(false)
+      this.startScamper(false, false)
       this.scamper!.runProgram()
     })
     runWindowButton.addEventListener('click', async () => {
@@ -150,7 +151,12 @@ class IDE {
       const params = new URLSearchParams({ filename: this.currentFile, isTree: "false" })
       window.open(`runner.html?${params.toString()}`)
     })
-    stepButton.addEventListener('click', () => this.startScamper(true))
+    drawButton.addEventListener('click', () => {
+      this.startScamper(true, true)
+      this.scamper!.stepProgram()
+      outputPane.scrollTo(0, outputPane.scrollHeight)
+    })
+    stepButton.addEventListener('click', () => this.startScamper(true, false))
     stepOnceButton.addEventListener('click', () => {
       this.scamper!.stepProgram()
       outputPane.scrollTo(0, outputPane.scrollHeight)
@@ -166,9 +172,6 @@ class IDE {
     astTextButton.addEventListener('click', () => {
       this.showASTText()
     })
-    // drawButton.addEventListener('click', () => {
-    //   this.scamper!.drawVis()
-    // })
     astWindowButton.addEventListener('click', () => {
       this.saveCurrentFile()
       const params = new URLSearchParams({filename: this.currentFile, isTree: "true"})
