@@ -3,6 +3,7 @@ import { Env, Prog, Op, reservedWords, Value, } from './lang.js'
 import { renderToHTML, mkCodeElement, mkSourceBlock, renderToOutput , renderToDraw } from './display.js'
 import * as C from './contract.js'
 import './styles.css'
+import { makeList } from './docs/api/prelude.js'
 
 let maxCallStackDepth = 100000;
 
@@ -1188,6 +1189,8 @@ export class Sem {
 
       if(stack[0]) {
         stackString = stack[stack.length - 1]?.toString()
+        console.log(stack[0])
+        console.log(stackString)
         if(typeof stack[0] != 'string' && typeof stack[0] != 'number' && typeof stack[0] != 'boolean') {
           if(stack[0] != undefined && Value.typeOf(stack[0]) === 'vector') {
             stackString = drawVector(stack[0])
@@ -1210,6 +1213,9 @@ export class Sem {
                 } else {
                   stackString = drawPair(Value.mkPair(last.fst, last.snd))
                 }
+              } else if(stack[0].name === 'map') {
+                //forEachstack.push(Value.mkList)
+                console.log("mapping")
               }
             } else {
               stackString = ("PROCEDURE")
