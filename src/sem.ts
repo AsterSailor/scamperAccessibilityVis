@@ -803,6 +803,67 @@ function drawList(list: any): any {
   }
 }
 
+//Should always be initially called with a blank div for img
+function altDrawListHTML (list: any, count: number, img: HTMLElement) {
+  if(list.fst.isList) {
+    altDrawListHTML(list.fst, count - 1, img);
+  } else {
+    let len = lengthList(list);
+
+    //loops through the list creating pairs and arrows for each element
+    
+      //creates the container for the individual list element and the sub element that contains the list pair
+      const col = document.createElement('div');
+      col.className = 'vector-style';
+      const top = document.createElement('div');
+      top.className = 'list-style'
+
+      //creates the list pair elements
+      for(let j = 0; j < 2; j++) {
+        const box = document.createElement('div');
+        box.tabIndex = 0;
+        if(j === 0) {
+          box.ariaDescription = `list pair ${i}, first element contains ${list.fst}`;
+        } else {
+          box.ariaDescription = `list pair ${i}, second element contains a list pair`;
+        }
+        if(i === len!-1 && j === 1) {
+          box.className = 'null-box';
+          box.ariaDescription = `list pair ${i}, second element contains null`;
+        } else {
+          box.className = 'list-box';
+        }
+        top.appendChild(box);
+      }
+
+      //creates the arrow pointing to the next list element, if there is one
+      if(i !== len! - 1) {
+        const nextArrow = document.createElement('div');
+        nextArrow.className = 'list-arrow';
+        const arrowHead = document.createElement('div');
+        arrowHead.className = 'arrow-box'
+        arrowHead.textContent = '▶'
+        top.appendChild(nextArrow);
+        top.appendChild(arrowHead);
+      }
+      col.appendChild(top);
+
+      //creates the arrow pointing to the contained element
+      for(let j = 0; j < len! - i; j++) {
+        const arrow = document.createElement('div');
+        arrow.className = 'list-arrow-down'
+        col.appendChild(arrow);
+      }
+
+      //creates the box containing the value in the element
+      const val = document.createElement('div');
+      val.className = 'val-box';
+      val.textContent = '▼\n' + list.fst;
+      col.appendChild(val);
+  
+  }
+}
+
 function drawListHTML(list: any): any {
   //declares overall html object to be appended to page
   const div = document.createElement('div');
