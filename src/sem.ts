@@ -710,7 +710,7 @@ function vectorHeight(vec: any, index: number = 0): number {
       height = height + vectorHeight(e, 0) + 1
     }
   }
-  return height
+  return height + 3
 }
 
 function drawVector(vector: any): any {
@@ -763,14 +763,20 @@ function drawVectorHTML(vector: any): any {
     col.appendChild(box);
 
     //creates the arrow element for the vector
-    for(let j=0; j < vectorHeight(vector, i + 1); j++) {
-      // if(i !== vector.length) {
-      //   height = height + 2
-      // }
+    for(let j=0; j < vectorHeight(vector, i + 1) - 3; j++) {
       const arrow = document.createElement('div');
       arrow.className = 'vec-arrow'
       col.appendChild(arrow);
     }
+
+    // if(i < vector.length - 1 && (Value.typeOf(vector[i + 1]) === 'vector' || Value.isPair(vector[i + 1]))) {
+    //   //creates 3 more arrow elements for the vector
+    //   for(let j=0; j < 3; j++) {
+    //   const arrow = document.createElement('div');
+    //   arrow.className = 'vec-arrow'
+    //   col.appendChild(arrow);
+    // }
+    // }
 
     const val = document.createElement('div');
     val.className = 'val-box';
@@ -870,7 +876,7 @@ function listHeight(list: any): number {
       }
     }
   }
-  return height
+  return height + 3
 }
 
 // function listLooper(list: any, count: number = 0): number {
