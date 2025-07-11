@@ -801,6 +801,39 @@ function drawList(list: any): any {
   }
 }
 
+function listHeight(list: any): number {
+  let height = 0
+  if(list.isList) {
+    const fst = list.fst
+    if(list.snd === null) {
+      if(typeof fst === 'string' || typeof fst === 'number' || typeof fst === 'boolean') {
+        return height + 1 + 2
+      } else if(Value.isPair(fst)) {
+        if(fst.isList) {
+          return height + listHeight(fst) + 2
+        } else {
+          return height + 1 + 2
+        }
+      } else if(Value.typeOf(fst) === 'vector') {
+        return height + fst.length + 2
+      }
+    } else {
+      if(typeof fst === 'string' || typeof fst === 'number' || typeof fst === 'boolean') {
+        return height + 1 + listHeight(list.snd)
+      } else if(Value.isPair(fst)) {
+        if(fst.isList) {
+          return height + listHeight(fst) + listHeight(list.snd)
+        } else {
+          return height + 1 + listHeight(list.snd)
+        }
+      } else if(Value.typeOf(fst) === 'vector') {
+        return height + fst.length + listHeight(list.snd)
+      }
+    }
+  }
+  return height
+}
+
 function drawListHTML(list: any): any {
   //declares overall html object to be appended to page
   const div = document.createElement('div');
@@ -1170,7 +1203,7 @@ export class Sem {
                 strVal = drawVector(e[1])
                 HTMLVal = drawVectorHTML(e[1])
               } else if (e[1] != undefined && Value.typeOf(e[1]) === 'list') {
-                strVal = drawList(e[1])
+                strVal = drawList(e[1]) + ' List Height == ' + listHeight(e[1])
                 HTMLVal = drawListHTML(e[1])
               } else if (e[1] != undefined && Value.isPair(e[1])) {
                 strVal = drawPair(e[1])
