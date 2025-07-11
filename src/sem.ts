@@ -745,7 +745,7 @@ function drawVectorHTML(vector: any): any {
     const col = document.createElement('div');
     col.className = 'vector-style';
     if (i > 0) col.style.position = 'absolute'
-    col.style.left = `${40 * vector.indexOf(e)}px`
+    col.style.left = `${30 * vector.indexOf(e)}px`
     //col.style.top = '20px'
 
     //creates the elements for the box elements of the vector
@@ -852,17 +852,18 @@ function listHeight(list: any): number {
     const fst = list.fst
     if(list.snd === null) {
       if(typeof fst === 'string' || typeof fst === 'number' || typeof fst === 'boolean') {
-        return height + 1 + 1
+        return height + 1 //1
       } else if(Value.isPair(fst)) {
         if(fst.isList) {
-          return height + listHeight(fst) + 1 + 1
+          return height + listHeight(fst)//2
         } else {
-          return height + 1 + 1
+          return height + 1
         }
       } else if(Value.typeOf(fst) === 'vector') {
-        return height + vectorHeight(fst) + 2 + 1
+        return height + fst.length //2
       }
     } else {
+      const next = list.snd.fst;
       if(typeof fst === 'string' || typeof fst === 'number' || typeof fst === 'boolean') {
         return height + 1 + listHeight(list.snd)
       } else if(Value.isPair(fst)) {
@@ -1068,6 +1069,10 @@ function drawPair(pair: any): any {
     str = str + drawList(snd) + ' }'
   }
   return str
+}
+
+function drawPairHTML(pair: any): any {
+
 }
 
 export class Sem {
