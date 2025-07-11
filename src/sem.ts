@@ -1340,7 +1340,7 @@ export class Sem {
                 strVal = drawVector(e[1]) + ' Vetcor Height ' + (vectorHeight(e[1]) + 1)
                 HTMLVal = drawVectorHTML(e[1])
               } else if (e[1] != undefined && Value.typeOf(e[1]) === 'list') {
-                strVal = drawList(e[1]) + ' List Height == ' + listHeight(e[1]) + 1
+                strVal = drawList(e[1]) + ' List Height == ' + (listHeight(e[1]) + 1)
                 HTMLVal = drawListHTML(e[1])
               } else if (e[1] != undefined && Value.isPair(e[1])) {
                 strVal = drawPair(e[1])
