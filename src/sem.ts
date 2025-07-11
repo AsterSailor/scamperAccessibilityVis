@@ -852,32 +852,32 @@ function listHeight(list: any): number {
     const fst = list.fst
     if(list.snd === null) {
       if(typeof fst === 'string' || typeof fst === 'number' || typeof fst === 'boolean') {
-        return height + 1 //1
+        height = height + 1 + 1
       } else if(Value.isPair(fst)) {
         if(fst.isList) {
-          return height + listHeight(fst)//2
+          height = height + listHeight(fst) + 1
         } else {
-          return height + 1
+          height = height + 3 + 1
         }
       } else if(Value.typeOf(fst) === 'vector') {
-        return height + fst.length //2
+        height = height + vectorHeight(fst) + 1
       }
     } else {
       const next = list.snd.fst;
       if(typeof fst === 'string' || typeof fst === 'number' || typeof fst === 'boolean') {
-        return height + 1 + listHeight(list.snd)
+        height = height + 1 + listHeight(list.snd)
       } else if(Value.isPair(fst)) {
         if(fst.isList) {
-          return height + listHeight(fst) + listHeight(list.snd)
+          height = height + 1 + listHeight(fst) + listHeight(list.snd)
         } else {
-          return height + 1 + listHeight(list.snd)
+          height = height + 1 + listHeight(list.snd)
         }
       } else if(Value.typeOf(fst) === 'vector') {
-        return height + vectorHeight(fst) + 2 + listHeight(list.snd)
+        height = height + vectorHeight(fst) + listHeight(list.snd)
       }
     }
   }
-  return height + 3
+  return height + 2
 }
 
 // function listLooper(list: any, count: number = 0): number {
@@ -1014,30 +1014,37 @@ function drawListHTML(list: any): any {
       }
       col.appendChild(top);
 
-      //creates the arrow pointing to the contained element
-      for(let j = 0; j < listHeight(list); j++) {
+      if(list.snd !== null) {
+        //creates the arrow pointing to the contained element
+        for(let j = 0; j < listHeight(list.snd); j++) {
+          const arrow = document.createElement('div');
+          arrow.className = 'list-arrow-down'
+          col.appendChild(arrow);
+        }
+      } else {
         const arrow = document.createElement('div');
         arrow.className = 'list-arrow-down'
         col.appendChild(arrow);
       }
-      
+        
       let el = list.fst
       const val = document.createElement('div');
       val.className = 'val-box';
+      val.textContent = '▼\n'
+      col.appendChild(val);
+      const val2 = document.createElement('div');
+      val2.className = 'val-box';
       //creates the box containing the value in the element
       if(typeof el === 'string' || typeof el === 'number' || typeof el === 'boolean') {
-        val.textContent = '▼\n' + el;
-        col.appendChild(val);
+        val2.textContent = el + ''
+        col.appendChild(val2);
       } else if (Value.isPair(el)) {
         if(el.isList) {
-          val.textContent = '▼\n';
           col.appendChild(drawListHTML(el));
         } else {
-          val.textContent = '▼\n';
           col.appendChild(drawPair(el));
         }
       } else if (Value.typeOf(val) === 'vector') {
-        val.textContent = '▼\n';
         col.appendChild(drawVectorHTML(el));
       }
       
