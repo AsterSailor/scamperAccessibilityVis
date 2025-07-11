@@ -885,17 +885,31 @@ function drawListHTML(list: any): any {
       col.appendChild(top);
 
       //creates the arrow pointing to the contained element
-      for(let j = 0; j < len! - i; j++) {
+      for(let j = 0; j < listHeight(list); j++) {
         const arrow = document.createElement('div');
         arrow.className = 'list-arrow-down'
         col.appendChild(arrow);
       }
-
-      //creates the box containing the value in the element
+      
+      let el = list.fst
       const val = document.createElement('div');
       val.className = 'val-box';
-      val.textContent = '▼\n' + list.fst;
-      col.appendChild(val);
+      //creates the box containing the value in the element
+      if(typeof el === 'string' || typeof el === 'number' || typeof el === 'boolean') {
+        val.textContent = '▼\n' + el;
+        col.appendChild(val);
+      } else if (Value.isPair(el)) {
+        if(el.isList) {
+          val.textContent = '▼\n';
+          col.appendChild(drawListHTML(el));
+        } else {
+          val.textContent = '▼\n';
+          col.appendChild(drawPair(el));
+        }
+      } else if (Value.typeOf(val) === 'vector') {
+        val.textContent = '▼\n';
+        col.appendChild(drawVectorHTML(el));
+      }
       
       //iterates the list
       list = list.snd;
