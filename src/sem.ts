@@ -759,13 +759,11 @@ function drawVectorHTML(vector: any): any {
 }
 
 function lengthList(lst: any, count: number = 0) {
-  if(lst.isList) {
-    if(lst.snd === null) {
-      return count + 1
-    } else {
-      count = count + 1
-      return lengthList(lst.snd, count)
-    }
+  if(lst.snd === null) {
+    return count + 1
+  } else {
+    count = count + 1
+    return lengthList(lst.snd, count)
   }
 }
 
@@ -799,6 +797,90 @@ function drawList(list: any): any {
     }
     
   }
+}
+
+function listLooper(list: any, count: number = 0): number {
+  let len = lengthList(list);
+  for(let i = 0; i < len!; i++) {
+    if(list.fst.isList) {
+      //please for the love of god don't forget the mindspace for this
+      count += lengthList(list.fst);
+      count += listLooper(list.fst);
+    }
+  }
+  return count;
+}
+
+function drawListAlt(list: any) {
+  //declares overall html object to be appended to page
+  const div = document.createElement('div');
+  div.ariaDescription = 'object type list';
+  div.tabIndex = 0;
+  let elemArr: any[] = [];
+
+  if(list.isList) {
+    let len = lengthList(list);
+
+    //loops through the list creating pairs and arrows for each element
+    for(let i = 0; i < len!; i++) {
+      //creates the container for the individual list element and the sub element that contains the list pair
+      const col = document.createElement('div');
+      col.className = 'vector-style';
+      const top = document.createElement('div');
+      top.className = 'list-style'
+
+      //creates the list pair elements
+      for(let j = 0; j < 2; j++) {
+        const box = document.createElement('div');
+        box.tabIndex = 0;
+        if(j === 0) {
+          box.ariaDescription = `list pair ${i}, first element contains ${list.fst}`;
+          box.ariaLabel = `list pair ${i}, first element contains ${list.fst}`;
+        } else {
+          box.ariaDescription = `list pair ${i}, second element contains a list pair`;
+          box.ariaLabel = `list pair ${i}, second element contains a list pair`;
+        }
+        if(i === len!-1 && j === 1) {
+          box.className = 'null-box';
+          box.ariaDescription = `list pair ${i}, second element contains null`;
+          box.ariaLabel = `list pair ${i}, second element contains null`;
+        } else {
+          box.className = 'list-box';
+        }
+        top.appendChild(box);
+      }
+
+      //creates the arrow pointing to the next list element, if there is one
+      if(i !== len! - 1) {
+        const nextArrow = document.createElement('div');
+        nextArrow.className = 'list-arrow';
+        const arrowHead = document.createElement('div');
+        arrowHead.className = 'arrow-box'
+        arrowHead.textContent = '▶'
+        top.appendChild(nextArrow);
+        top.appendChild(arrowHead);
+      }
+      col.appendChild(top);
+
+      //creates the arrow pointing to the contained element
+      for(let j = 0; j < len! - i; j++) {
+        const arrow = document.createElement('div');
+        arrow.className = 'list-arrow-down'
+        col.appendChild(arrow);
+      }
+
+      //creates the box containing the value in the element
+      const val = document.createElement('div');
+      val.className = 'val-box';
+      val.textContent = '▼\n' + list.fst;
+      col.appendChild(val);
+      
+      //iterates the list
+      list = list.snd;
+      div.appendChild(col);
+    }
+  }
+  return div;
 }
 
 function drawListHTML(list: any): any {
