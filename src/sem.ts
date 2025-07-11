@@ -693,6 +693,26 @@ function makeTraceHeader (s: Stmt.T): HTMLElement {
   }
 }
 
+
+function vectorHeight(vec: any, index: number = 0): number {
+  let height = 1;
+  for(let i = index; i < vec.length; i++) {
+    let e = vec[i]
+    if(typeof e === 'string' || typeof e === 'number' || typeof e === 'boolean') {
+      height = height + 1
+    } else if(Value.isPair(e)) {
+      if(e.isList) {
+        height = height + listHeight(e) + 1
+      } else {
+        height = height + 1
+      }
+    } else if(Value.typeOf(e) === 'vector') {
+      height = height + vectorHeight(e, 0) + 1
+    }
+  }
+  return height
+}
+
 function drawVector(vector: any): any {
   let str = ''
   vector.forEach((e: any) => {
@@ -720,13 +740,13 @@ function drawVectorHTML(vector: any): any {
   div.style.position = 'relative';
 
   //loops through the vector, making the visualization pieces for each element
-  vector.forEach((e: any) => {
+  vector.forEach((e: any, i: number) => {
     //container for all the html elements for one vector element
     const col = document.createElement('div');
     col.className = 'vector-style';
-    col.style.position = 'absolute'
+    if (i > 0) col.style.position = 'absolute'
     col.style.left = `${40 * vector.indexOf(e)}px`
-    col.style.top = '20px'
+    //col.style.top = '20px'
 
     //creates the elements for the box elements of the vector
     const box = document.createElement('div');
@@ -743,37 +763,37 @@ function drawVectorHTML(vector: any): any {
     col.appendChild(box);
 
     //creates the arrow element for the vector
-    for(let i=0; i < vector.length - vector.indexOf(e); i++) {
-      
-      for(let j=0; j < vectorHeight(vector, i); j++) {
-        const arrow = document.createElement('div');
-        arrow.className = 'vec-arrow'
-        col.appendChild(arrow);
-      }
+    for(let j=0; j < vectorHeight(vector, i + 1); j++) {
+      // if(i !== vector.length) {
+      //   height = height + 2
+      // }
+      const arrow = document.createElement('div');
+      arrow.className = 'vec-arrow'
+      col.appendChild(arrow);
     }
 
     const val = document.createElement('div');
     val.className = 'val-box';
+    val.textContent = '▼\n';
+    col.appendChild(val);
+    let val2 = document.createElement('div');
+    val2.className = 'val-box';
     //creates the box containing the value in the element
     if(typeof e === 'string' || typeof e === 'number' || typeof e === 'boolean') {
-      val.textContent = '▼\n' + e;
-      col.appendChild(val);
+      val2.textContent = e + '';
+      col.appendChild(val2);
     } else if (Value.isPair(e)) {
       if(e.isList) {
-        val.textContent = '▼\n';
         col.appendChild(drawListHTML(e));
       } else {
-        val.textContent = '▼\n';
         col.appendChild(drawPair(e));
       }
-    } else if (Value.typeOf(val) === 'vector') {
-      val.textContent = '▼\n';
+    } else if (Value.typeOf(e) === 'vector') {
       col.appendChild(drawVectorHTML(e));
     }
-
-    //appends a fully constructed vector element to the overall vector container
-    div.appendChild(col);
+     div.appendChild(col);
   })
+  
 
   return div
 }
@@ -819,24 +839,6 @@ function drawList(list: any): any {
   }
 }
 
-function vectorHeight(vec: any, index: number = 0): number {
-  let height = 1;
-  for(let i = index; i < vec.length; i++) {
-    let e = vec[i]
-    if(typeof e === 'string' || typeof e === 'number' || typeof e === 'boolean') {
-      height = height + 1
-    } else if(Value.isPair(e)) {
-      if(e.isList) {
-        height = height + listHeight(e) + 1
-      } else {
-        height = height + 1
-      }
-    } else if(Value.typeOf(e) === 'vector') {
-      height = height + vectorHeight(e, 0) + 1
-    }
-  }
-  return height
-}
 
 function listHeight(list: any): number {
   let height = 0
@@ -852,7 +854,7 @@ function listHeight(list: any): number {
           return height + 1 + 1
         }
       } else if(Value.typeOf(fst) === 'vector') {
-        return height + vectorHeight(fst) + 1 + 1
+        return height + vectorHeight(fst) + 2 + 1
       }
     } else {
       if(typeof fst === 'string' || typeof fst === 'number' || typeof fst === 'boolean') {
@@ -864,7 +866,7 @@ function listHeight(list: any): number {
           return height + 1 + listHeight(list.snd)
         }
       } else if(Value.typeOf(fst) === 'vector') {
-        return height + vectorHeight(fst) + 1 + listHeight(list.snd)
+        return height + vectorHeight(fst) + 2 + listHeight(list.snd)
       }
     }
   }
