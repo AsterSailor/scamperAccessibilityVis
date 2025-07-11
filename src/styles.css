@@ -90,6 +90,7 @@
     box-sizing: border-box;
     display: inline-block;
     vertical-align: middle;
+    flex: 1
 }
 
 .list-style {
