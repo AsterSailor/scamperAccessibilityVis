@@ -740,16 +740,32 @@ function drawVectorHTML(vector: any): any {
 
     //creates the arrow element for the vector
     for(let i=0; i < vector.length - vector.indexOf(e); i++) {
-      const arrow = document.createElement('div');
-      arrow.className = 'vec-arrow'
-      col.appendChild(arrow);
+      
+      for(let j=0; j < vectorHeight(vector, i); j++) {
+        const arrow = document.createElement('div');
+        arrow.className = 'vec-arrow'
+        col.appendChild(arrow);
+      }
     }
 
-    //creates the value element for the vector
     const val = document.createElement('div');
-    val.className = 'val-box'
-    val.textContent = '▽\n' + e;
-    col.appendChild(val);
+    val.className = 'val-box';
+    //creates the box containing the value in the element
+    if(typeof e === 'string' || typeof e === 'number' || typeof e === 'boolean') {
+      val.textContent = '▼\n' + e;
+      col.appendChild(val);
+    } else if (Value.isPair(e)) {
+      if(e.isList) {
+        val.textContent = '▼\n';
+        col.appendChild(drawListHTML(e));
+      } else {
+        val.textContent = '▼\n';
+        col.appendChild(drawPair(e));
+      }
+    } else if (Value.typeOf(val) === 'vector') {
+      val.textContent = '▼\n';
+      col.appendChild(drawVectorHTML(e));
+    }
 
     //appends a fully constructed vector element to the overall vector container
     div.appendChild(col);
@@ -799,21 +815,40 @@ function drawList(list: any): any {
   }
 }
 
+function vectorHeight(vec: any, index: number = 0): number {
+  let height = 1;
+  for(let i = index; i < vec.length; i++) {
+    let e = vec[i]
+    if(typeof e === 'string' || typeof e === 'number' || typeof e === 'boolean') {
+      height = height + 1
+    } else if(Value.isPair(e)) {
+      if(e.isList) {
+        height = height + listHeight(e) + 1
+      } else {
+        height = height + 1
+      }
+    } else if(Value.typeOf(e) === 'vector') {
+      height = height + vectorHeight(e, 0) + 1
+    }
+  }
+  return height
+}
+
 function listHeight(list: any): number {
   let height = 0
   if(list.isList) {
     const fst = list.fst
     if(list.snd === null) {
       if(typeof fst === 'string' || typeof fst === 'number' || typeof fst === 'boolean') {
-        return height + 1 + 2
+        return height + 1 + 1
       } else if(Value.isPair(fst)) {
         if(fst.isList) {
-          return height + listHeight(fst) + 2
+          return height + listHeight(fst) + 1 + 1
         } else {
-          return height + 1 + 2
+          return height + 1 + 1
         }
       } else if(Value.typeOf(fst) === 'vector') {
-        return height + fst.length + 2
+        return height + vectorHeight(fst) + 1 + 1
       }
     } else {
       if(typeof fst === 'string' || typeof fst === 'number' || typeof fst === 'boolean') {
@@ -825,7 +860,7 @@ function listHeight(list: any): number {
           return height + 1 + listHeight(list.snd)
         }
       } else if(Value.typeOf(fst) === 'vector') {
-        return height + fst.length + listHeight(list.snd)
+        return height + vectorHeight(fst) + 1 + listHeight(list.snd)
       }
     }
   }
@@ -1296,10 +1331,10 @@ export class Sem {
                 strVal = strVal
                 HTMLVal = '-'
               } else if (e[1] != undefined && Value.typeOf(e[1]) === 'vector') {
-                strVal = drawVector(e[1])
+                strVal = drawVector(e[1]) + ' Vetcor Height ' + (vectorHeight(e[1]) + 1)
                 HTMLVal = drawVectorHTML(e[1])
               } else if (e[1] != undefined && Value.typeOf(e[1]) === 'list') {
-                strVal = drawList(e[1]) + ' List Height == ' + listHeight(e[1])
+                strVal = drawList(e[1]) + ' List Height == ' + listHeight(e[1]) + 1
                 HTMLVal = drawListHTML(e[1])
               } else if (e[1] != undefined && Value.isPair(e[1])) {
                 strVal = drawPair(e[1])
