@@ -724,7 +724,9 @@ function drawVectorHTML(vector: any): any {
     //container for all the html elements for one vector element
     const col = document.createElement('div');
     col.className = 'vector-style';
+    col.style.position = 'absolute'
     col.style.left = `${40 * vector.indexOf(e)}px`
+    col.style.top = '20px'
 
     //creates the elements for the box elements of the vector
     const box = document.createElement('div');
