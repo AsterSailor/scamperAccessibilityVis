@@ -769,15 +769,6 @@ function drawVectorHTML(vector: any): any {
       col.appendChild(arrow);
     }
 
-    // if(i < vector.length - 1 && (Value.typeOf(vector[i + 1]) === 'vector' || Value.isPair(vector[i + 1]))) {
-    //   //creates 3 more arrow elements for the vector
-    //   for(let j=0; j < 3; j++) {
-    //   const arrow = document.createElement('div');
-    //   arrow.className = 'vec-arrow'
-    //   col.appendChild(arrow);
-    // }
-    // }
-
     const val = document.createElement('div');
     val.className = 'val-box';
     val.textContent = '▼\n';
@@ -814,13 +805,10 @@ function lengthList(lst: any, count: number = 0) {
 }
 
 function drawList(list: any): any {
-  //console.log('in func')
   if(list.isList) {
-    //console.log('found true')
     let str = '{ '
     let val = list.fst
     let next = list.snd
-    //console.log('val: ' + val + ' and next: ' + next)
     if(typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean') {
     //  console.log(val)
       str = str + val + ''
@@ -833,12 +821,9 @@ function drawList(list: any): any {
     } else if (Value.typeOf(val) === 'vector') {
       str = str + drawVector(val) + ''
     }
-    //console.log('str so far: ' + str)
     if(next === null) {
-    //  console.log('found the end ' + next)
       return str + ' }{ /}'
     } else {
-    //  console.log('call with ' + next)
       return str = str + ' }{ -}-> ' + drawList(next)
     }
     
