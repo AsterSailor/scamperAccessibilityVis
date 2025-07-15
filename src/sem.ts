@@ -848,7 +848,7 @@ function listHeight(list: any): number {
         height = height + vectorHeight(fst) + 1
       }
     } else {
-      const next = list.snd.fst;
+      //const next = list.snd.fst;
       if(typeof fst === 'string' || typeof fst === 'number' || typeof fst === 'boolean') {
         height = height + listHeight(list.snd) + 1
       } else if(Value.isPair(fst)) {
@@ -949,11 +949,12 @@ function listHeight(list: any): number {
 //   return div;
 // }
 
-function drawListHTML(list: any): any {
+//should be called with no nesting initially
+function drawListHTML(list: any, nesting: number = 0): any {
   //declares overall html object to be appended to page
   const div = document.createElement('div');
   div.ariaDescription = 'object type list';
-  div.tabIndex = 0;
+  //div.tabIndex = 0;
   div.style.position = 'relative';
 
   if(list.isList) {
@@ -974,8 +975,16 @@ function drawListHTML(list: any): any {
         const box = document.createElement('div');
         box.tabIndex = 0;
         if(j === 0) {
-          box.ariaDescription = `list pair ${i}, first element contains ${list.fst}`;
-          box.ariaLabel = `list pair ${i}, first element contains ${list.fst}`;
+          if(list.fst.isList) {
+            box.ariaDescription = `list pair ${i}, nesting level ${nesting} first element contains another list`;
+            box.ariaLabel = `list pair ${i}, nesting level ${nesting} first element contains another list`;
+          } else if(Value.typeOf(list.fst) === 'vector') {
+            box.ariaDescription = `list pair ${i}, nesting level ${nesting} first element contains a vector`;
+            box.ariaLabel = `list pair ${i}, nesting level ${nesting} first element contains a vector`;
+          } else {
+            box.ariaDescription = `list pair ${i}, nesting level ${nesting} first element contains ${list.fst}`;
+            box.ariaLabel = `list pair ${i}, nesting level ${nesting} first element contains ${list.fst}`;
+          }
         } else {
           box.ariaDescription = `list pair ${i}, second element contains a list pair`;
           box.ariaLabel = `list pair ${i}, second element contains a list pair`;
@@ -1028,7 +1037,7 @@ function drawListHTML(list: any): any {
         col.appendChild(val2);
       } else if (Value.isPair(el)) {
         if(el.isList) {
-          col.appendChild(drawListHTML(el));
+          col.appendChild(drawListHTML(el, nesting + 1));
         } else {
           col.appendChild(drawPair(el));
         }
