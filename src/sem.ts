@@ -702,7 +702,7 @@ function vectorHeight(vec: any, index: number = 0): number {
       height = height + 1
     } else if(Value.isPair(e)) {
       if(e.isList) {
-        height = height + listHeight(e) + 1
+        height = height + listHeight(e) + 2
       } else {
         height = height + 1
       }
@@ -837,7 +837,7 @@ function listHeight(list: any): number {
     const fst = list.fst
     if(list.snd === null) {
       if(typeof fst === 'string' || typeof fst === 'number' || typeof fst === 'boolean') {
-        height = height + 1 + 1
+        height = height + 1 //1
       } else if(Value.isPair(fst)) {
         if(fst.isList) {
           height = height + listHeight(fst) + 1
@@ -850,19 +850,19 @@ function listHeight(list: any): number {
     } else {
       const next = list.snd.fst;
       if(typeof fst === 'string' || typeof fst === 'number' || typeof fst === 'boolean') {
-        height = height + 1 + listHeight(list.snd)
+        height = height + listHeight(list.snd) + 1
       } else if(Value.isPair(fst)) {
         if(fst.isList) {
-          height = height + 1 + listHeight(fst) + listHeight(list.snd)
+          height = height + listHeight(fst) + listHeight(list.snd) //1
         } else {
-          height = height + 1 + listHeight(list.snd)
+          height = height + listHeight(list.snd) //1
         }
       } else if(Value.typeOf(fst) === 'vector') {
         height = height + vectorHeight(fst) + listHeight(list.snd)
       }
     }
   }
-  return height + 2
+  return height + 1
 }
 
 // function listLooper(list: any, count: number = 0): number {
@@ -954,6 +954,7 @@ function drawListHTML(list: any): any {
   const div = document.createElement('div');
   div.ariaDescription = 'object type list';
   div.tabIndex = 0;
+  div.style.position = 'relative';
 
   if(list.isList) {
     let len = lengthList(list);
@@ -963,6 +964,8 @@ function drawListHTML(list: any): any {
       //creates the container for the individual list element and the sub element that contains the list pair
       const col = document.createElement('div');
       col.className = 'vector-style';
+      if(i > 0) col.style.position = 'absolute';
+      col.style.left = `${105 * i}px`;
       const top = document.createElement('div');
       top.className = 'list-style'
 
@@ -1015,7 +1018,7 @@ function drawListHTML(list: any): any {
       let el = list.fst
       const val = document.createElement('div');
       val.className = 'val-box';
-      val.textContent = '▼\n'
+      val.textContent = '▼'
       col.appendChild(val);
       const val2 = document.createElement('div');
       val2.className = 'val-box';
