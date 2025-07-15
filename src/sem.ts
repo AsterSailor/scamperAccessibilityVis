@@ -758,8 +758,16 @@ function drawVectorHTML(vector: any): any {
     box.className = 'vector-box';
     //box.role = 'img'
     box.tabIndex = 0;
-    box.ariaDescription = `vector index ${indexVal} contains ${'' + e}`
-    box.ariaLabel = `vector index ${indexVal} contains ${'' + e}`
+    if(e.isList) {
+      box.ariaDescription = `vector index ${indexVal} contains a list`
+      box.ariaLabel = `vector index ${indexVal} contains a list`
+    } else if(Value.typeOf(e) === 'vector') {
+      box.ariaDescription = `vector index ${indexVal} contains a vector`
+      box.ariaLabel = `vector index ${indexVal} contains a vector`
+    } else {
+      box.ariaDescription = `vector index ${indexVal} contains ${'' + e}`
+      box.ariaLabel = `vector index ${indexVal} contains ${'' + e}`
+    }
     col.appendChild(box);
 
     //creates the arrow element for the vector
@@ -790,8 +798,6 @@ function drawVectorHTML(vector: any): any {
     }
      div.appendChild(col);
   })
-  
-
   return div
 }
 
