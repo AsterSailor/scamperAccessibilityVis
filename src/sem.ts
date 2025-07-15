@@ -1075,8 +1075,168 @@ function drawPair(pair: any): any {
   return str
 }
 
-function drawPairHTML(pair: any): any {
+function pairHeight(pair: any) {
+  let height = 3
+  let fst = pair.fst
+  let snd = pair.snd
+  
+  //height of pair.snd
+  if(typeof snd === 'string' || typeof snd === 'number' || typeof snd === 'boolean' ) {
+    height = height + 1
+  } else if (Value.isPair(snd)) {
+    if(snd.isList) {
+      height = height + listHeight(snd)
+    } else {
+      height = height + pairHeight(snd)
+    }
+  } else if (Value.typeOf(snd) === 'vector') {
+    height = height + vectorHeight(snd)
+  }
 
+  //height of pair.fst
+  if(typeof fst === 'string' || typeof fst === 'number' || typeof fst === 'boolean' ) {
+    height = height + 1
+  } else if (Value.isPair(fst)) {
+    if(fst.isList) {
+      height = height + listHeight(fst)
+    } else {
+      height = height + pairHeight(fst)
+    }
+  } else if (Value.typeOf(fst) === 'vector') {
+    height = height + vectorHeight(fst)
+  }
+
+  return height
+}
+
+function drawPairHTML(pair: any): any {
+  //Container for html elements
+  let div = document.createElement('div');
+  div.ariaLabel = 'object type vector';
+  div.tabIndex = 0;
+  div.style.position = 'relative';
+
+  //loops through the vector, making the visualization pieces for each element
+  for(let k = 0; k < 2; k++) {
+    
+    //container for all the html elements for one pair element
+    const col = document.createElement('div');
+    col.className = 'vector-style';
+    if (k > 0) col.style.position = 'absolute'
+    col.style.left = `${30 * k}px`
+    //col.style.top = '20px'
+
+    //creates the elements for the box elements of the vector
+    const box = document.createElement('div');
+    box.className = 'vector-box';
+    //box.role = 'img'
+    box.tabIndex = 0;
+    box.ariaDescription = `non-list pair ${k}, first element contains ${k === 0? pair.fst : pair.snd}`
+    box.ariaLabel = `non-list pair ${k}, first element contains ${k === 0? pair.fst : pair.snd}`
+    col.appendChild(box);
+    let snd = pair.snd
+
+    let height = 1
+    if(k === 0) {
+      if(typeof snd === 'string' || typeof snd === 'number' || typeof snd === 'boolean' ) {
+        height = height + 1
+      } else if (Value.isPair(snd)) {
+        if(snd.isList) {
+          height = height + listHeight(snd)
+        } else {
+          height = height + pairHeight(snd)
+        }
+      } else if (Value.typeOf(snd) === 'vector') {
+        height = height + vectorHeight(snd)
+      }
+    }
+    console.log(height)
+    //creates the arrow element for the vector
+    for(let j=0; j < height; j++) {
+      const arrow = document.createElement('div');
+      arrow.className = 'list-arrow-down'
+      col.appendChild(arrow);
+    }
+
+    let e = k === 0? pair.fst : pair.snd
+    const val = document.createElement('div');
+    val.className = 'val-box';
+    val.textContent = '▼\n';
+    col.appendChild(val);
+    let val2 = document.createElement('div');
+    val2.className = 'val-box';
+    //creates the box containing the value in the element
+    if(typeof e === 'string' || typeof e === 'number' || typeof e === 'boolean') {
+      val2.textContent = e + '';
+      col.appendChild(val2);
+    } else if (Value.isPair(e)) {
+      if(e.isList) {
+        col.appendChild(drawListHTML(e));
+      } else {
+        col.appendChild(drawPairHTML(e));
+      }
+    } else if (Value.typeOf(e) === 'vector') {
+      col.appendChild(drawVectorHTML(e));
+    }
+     div.appendChild(col);
+  }
+
+  // //declares overall html object to be appended to page
+  // const div = document.createElement('div');
+  // div.ariaDescription = 'object type list';
+  // div.tabIndex = 0;
+
+  // const col = document.createElement('div');
+  // col.className = 'vector-style';
+  // const top = document.createElement('div');
+  // top.className = 'list-style'
+  
+  // //creates the pair elements
+  // for(let j = 0; j < 2; j++) {
+  //   const box = document.createElement('div');
+  //   box.tabIndex = 0;
+  //   box.ariaDescription = `non-list pair ${i}, first element contains ${j === 0? pair.fst : pair.snd}`;
+  //   box.ariaLabel = `non-list pair ${i}, first element contains ${j === 0? pair.fst : pair.snd}`;
+  //   box.className = 'list-box';
+  //   top.appendChild(box);
+  // }
+  // col.appendChild(top);
+
+
+  //   //creates the arrow pointing to the contained element
+  //   for(let j = 0; j < 2; j++) {
+  //     const arrow = document.createElement('div');
+  //     arrow.className = 'list-arrow-down'
+  //     col.appendChild(arrow);
+  //   }
+
+  //   //creates the arrow pointing to the contained element
+  //   for(let j = 0; j < 1; j++) {
+  //     const arrow = document.createElement('div');
+  //     arrow.className = 'list-arrow-down'
+  //     col.appendChild(arrow);
+  //   }
+
+  // // if(pair.snd !== null) {
+  // //   //creates the arrow pointing to the contained element
+  // //   for(let j = 0; j < 2 - j; j++) {
+  // //     const arrow = document.createElement('div');
+  // //     arrow.className = 'list-arrow-down'
+  // //     col.appendChild(arrow);
+  // //   }
+  // // } else {
+  // //   const arrow = document.createElement('div');
+  // //   arrow.className = 'list-arrow-down'
+  // //   col.appendChild(arrow);
+  // // }
+
+  // const val = document.createElement('div');
+  // val.className = 'val-box';
+  // val.textContent = '▼\n'
+  // col.appendChild(val);
+
+  // div.appendChild(col);
+  return div;
 }
 
 export class Sem {
@@ -1359,6 +1519,7 @@ export class Sem {
                 HTMLVal = drawListHTML(e[1])
               } else if (e[1] != undefined && Value.isPair(e[1])) {
                 strVal = drawPair(e[1])
+                HTMLVal = drawPairHTML(e[1])
               } else if (e[1] != undefined && Value.isFunction(e[1])) {
                 strVal = ("PROCEDURE")
               } else {
@@ -1401,6 +1562,7 @@ export class Sem {
                   stackHTML = drawListHTML(Value.mkPair(last.fst, last.snd))
                 } else {
                   stackString = drawPair(Value.mkPair(last.fst, last.snd))
+                  stackHTML = drawPairHTML(Value.mkPair(last.fst, last.snd))
                 }
               } else if(stack[0].name === 'map') {
                 //forEachstack.push(Value.mkList)
