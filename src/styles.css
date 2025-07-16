@@ -137,13 +137,14 @@
 }
 
 .frame {
-    /* width: 50;
-    height: 50; */
+    width: 50;
+    height: 50;
     list-style-type: none;
-    background-color: #eee;
-    border: 1px solid #ddd;
+    background-color: #f8f8f8;
+    border: 1px solid #a0a0a0;
     padding: 20px;
+    overflow: auto;
   
-    flex: 0 0 100%;
+    flex: 1 0 100%;
     scroll-snap-align: center;
 }

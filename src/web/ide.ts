@@ -2,7 +2,6 @@ import { basicSetup } from 'codemirror'
 import { indentWithTab } from '@codemirror/commands'
 import { EditorView, keymap } from "@codemirror/view"
 import * as Parser from '../parser.js'
-import {addScroller , addFrame } from '../display.js'
 
 import FS from './fs/fs.js'
 import Split from 'split.js'
@@ -152,23 +151,32 @@ class IDE {
       const params = new URLSearchParams({ filename: this.currentFile, isTree: "false" })
       window.open(`runner.html?${params.toString()}`)
     })
-    stepButton.addEventListener('click', () => this.startScamper(true, false))
-    stepOnceButton.addEventListener('click', () => {
-      this.scamper!.stepProgram()
-      outputPane.scrollTo(0, outputPane.scrollHeight)
-    })
     drawButton.addEventListener('click', () => {
       this.startScamper(true, true)
       //this.scamper!.stepProgram()
       outputPane.scrollTo(0, outputPane.scrollHeight)
     })
+    stepButton.addEventListener('click', () => this.startScamper(true, false))
+    stepOnceButton.addEventListener('click', () => {
+      this.scamper!.stepProgram()
+      //@ts-ignore
+      if(!this.scamper.isDrawing) {
+        outputPane.scrollTo(0, outputPane.scrollHeight)
+      }
+    })
     stepStmtButton.addEventListener('click', () => {
       this.scamper!.stepStmtProgram()
-      outputPane.scrollTo(0, outputPane.scrollHeight)
+      //@ts-ignore
+      if(!this.scamper.isDrawing) {
+        outputPane.scrollTo(0, outputPane.scrollHeight)
+      }
     })
     stepAllButton.addEventListener('click', () => {
       this.scamper!.runProgram()
-      outputPane.scrollTo(0, outputPane.scrollHeight)
+      //@ts-ignore
+      if(!this.scamper.isDrawing) {
+        outputPane.scrollTo(0, outputPane.scrollHeight)
+      }
     })
     astTextButton.addEventListener('click', () => {
       this.showASTText()

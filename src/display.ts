@@ -126,11 +126,11 @@ export function renderToHTML (v: Value.T): HTMLElement {
   }
 }
 
-export function renderToOutput(output: HTMLElement, v: any, s: any = undefined) {
+export function renderToOutput(output: HTMLElement, v: any, s: any = "spookie") {
   const div = document.createElement('div')
   div.classList.add('scamper-output')
   div.appendChild(renderToHTML(v))
-  if(s === undefined) {
+  if(s === "spookie") {
     output!.appendChild(div)
   } else {
     output.insertBefore(div, s)

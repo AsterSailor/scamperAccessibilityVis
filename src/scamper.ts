@@ -1,7 +1,6 @@
 import {Env, ParserOutput, Prog} from './lang.js'
 import * as Parser from './parser.js'
 import * as Sem from './sem.js'
-import {addScroller , addFrame } from './display.js'
 
 import builtinLibs from './lib/builtin.js'
 import Prelude from './lib/prelude.js'
@@ -28,6 +27,7 @@ export class Scamper {
   env: Env
   display: HTMLElement
   isTracing: boolean
+  isDrawing: boolean
   parseroutput: ParserOutput
   prog: Prog
   sem: Sem.Sem
@@ -35,6 +35,7 @@ export class Scamper {
   constructor (display: HTMLElement, src: string, opts: ScamperOptions) {
     this.display = display
     this.isTracing = opts.isTracing
+    this.isDrawing = opts.isDrawing
     if (opts.initialEnv !== undefined) {
       this.env = opts.initialEnv
     } else {

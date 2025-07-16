@@ -1235,9 +1235,12 @@ export class Sem {
     this.curStmt += 1
     this.state = undefined
     if (!this.isFinished() && this.isTracing()) {
-      if( this.isDrawing) {
+      if(this.isDrawing) {
         this.display.insertBefore(this.traces![this.curStmt]!, findScroller(this.display))
-        this.display.children[this.curStmt].scrollIntoView()
+        let scrollVar = findScroller(this.display)
+        if(scrollVar) {
+          scrollVar.scrollLeft = scrollVar.scrollWidth
+        }
       } else {
       this.display.appendChild(this.traces![this.curStmt]!)
       }
