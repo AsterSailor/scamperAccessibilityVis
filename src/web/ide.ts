@@ -159,7 +159,7 @@ class IDE {
     })
     drawButton.addEventListener('click', () => {
       this.startScamper(true, true)
-      this.scamper!.stepProgram()
+      //this.scamper!.stepProgram()
       outputPane.scrollTo(0, outputPane.scrollHeight)
     })
     stepStmtButton.addEventListener('click', () => {

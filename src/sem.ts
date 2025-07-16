@@ -1,11 +1,13 @@
 import { ICE, Id, Library, Range, ScamperError, Stmt } from './lang.js'
 import { Env, Prog, Op, reservedWords, Value, } from './lang.js'
-import { renderToHTML, mkCodeElement, mkSourceBlock, renderToOutput , renderToDraw , addScroller , addFrame, addToFrame } from './display.js'
+import { renderToHTML, mkCodeElement, mkSourceBlock, renderToOutput , renderToDraw , addScroller , addFrame, addToFrame, findScroller } from './display.js'
 import * as C from './contract.js'
+//@ts-ignore
 import './styles.css'
 import { makeList } from './docs/api/prelude.js'
 
 let maxCallStackDepth = 100000;
+let stateHistory = [];
 
 ///// Machine state structures /////////////////////////////////////////////////
 
@@ -1162,7 +1164,7 @@ function drawPairHTML(pair: any): any {
         height = height + vectorHeight(snd)
       }
     }
-    console.log(height)
+
     //creates the arrow element for the vector
     for(let j=0; j < height; j++) {
       const arrow = document.createElement('div');
@@ -1228,7 +1230,11 @@ export class Sem {
         this.traces[i] = makeTraceDiv()
       }
       if(isDrawing) {
-        if(isDrawing) addScroller(this.display, "p")
+        addScroller(this.display, this.traces[prog.length - 1])
+        // for (let i = 0; i < prog.length; i++) {
+        //   this.display.insertBefore(this.traces[i], findScroller(this.display))
+        // }
+        
       }
     } else {
       this.traces = undefined
@@ -1258,7 +1264,12 @@ export class Sem {
     this.curStmt += 1
     this.state = undefined
     if (!this.isFinished() && this.isTracing()) {
+      if( this.isDrawing) {
+        this.display.insertBefore(this.traces![this.curStmt]!, findScroller(this.display))
+        this.display.children[this.curStmt].scrollIntoView()
+      } else {
       this.display.appendChild(this.traces![this.curStmt]!)
+      }
       this.appendToCurrentTrace(makeTraceHeader(this.prog[this.curStmt]))
       this.appendToCurrentTrace('\n')
     }
@@ -1288,12 +1299,12 @@ export class Sem {
           this.appendToCurrentTrace(' ')
           this.appendToCurrentTrace(renderToHTML(stateToExp(this.state)!))
           this.appendToCurrentTrace('\n')
+          //addToFrame(findScroller(this.display), "HYYYY")
           
         }
       } catch (e) {
-        renderToOutput(this.display, e)
+        renderToOutput(this.display, e, )
         this.advance()
-        if(this.isDrawing) {this.draw()}
       }
     } else {
       if (this.state.stack.length !== 1) {
@@ -1313,6 +1324,8 @@ export class Sem {
       }
       if(this.isDrawing) {
         this.draw()
+        //addToFrame(this.display, renderToHTML(stateToExp(this.state)!))
+        console.log(findScroller(this.display))
       }
       if (this.isTracing()) {
         this.appendToCurrentTrace(mkCodeElement(`${name} bound`))
@@ -1459,9 +1472,10 @@ export class Sem {
     if(envState != undefined){
       let bounded = envState.getBoundsEnv(initialLibNum)
       let stack = envState.getStack()
-      let frame = addFrame(this.display)
       if(!stack[0]) {
         if(bounded != undefined && bounded.length > 0) {
+          //@ts-ignore
+          let frame = addFrame(this.display.children.namedItem('scrolls'))
           //renderToDraw(this.display, "------------------------------~")
 
           bounded?.forEach(e => {
@@ -1510,7 +1524,9 @@ export class Sem {
           } else if (stack[0] != undefined && Value.isPair(stack[0])) {
             stackString = drawPair(stack[0])
           } else if (stack[0] != undefined && Value.isFunction(stack[0])) {
+            //@ts-ignore
             if(stack[0].name) {
+              //@ts-ignore
               if(stack[0].name === 'cons') {
                 let last: any = stack[stack.length - 1]
                 if(last.snd === null) {
@@ -1523,6 +1539,7 @@ export class Sem {
                   stackString = drawPair(Value.mkPair(last.fst, last.snd))
                   stackHTML = drawPairHTML(Value.mkPair(last.fst, last.snd))
                 }
+                //@ts-ignore
               } else if(stack[0].name === 'map') {
                 //forEachstack.push(Value.mkList)
                 console.log("mapping")
