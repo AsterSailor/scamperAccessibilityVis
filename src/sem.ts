@@ -757,6 +757,10 @@ function drawVectorHTML(vector: any): any {
     //col.style.top = '20px'
 
     //creates the elements for the box elements of the vector
+
+    //adds a listener that checks for certain arrow keys, on those presses moves to appropriate element
+    //stores all elements in that layer in an array for potential access, then focuses using
+    //the focus() function
     const box = document.createElement('div');
     const index = document.createElement('div');
     const indexVal = vector.indexOf(e).toString();
@@ -786,8 +790,8 @@ function drawVectorHTML(vector: any): any {
     }
 
     const val = document.createElement('div');
-    val.className = 'val-box';
-    val.textContent = '▼\n';
+    val.className = 'down-arrow-box';
+    val.textContent = '  ▽';
     col.appendChild(val);
     let val2 = document.createElement('div');
     val2.className = 'val-box';
@@ -879,92 +883,54 @@ function listHeight(list: any): number {
   return height + 1
 }
 
-// function listLooper(list: any, count: number = 0): number {
-//   let len = lengthList(list);
-//   for(let i = 0; i < len!; i++) {
-//     if(list.fst.isList) {
-//       //please for the love of god don't forget the mindspace for this
-//       count += lengthList(list.fst);
-//       count += listLooper(list.fst);
-//     }
-//   }
-//   return count;
-// }
-
-// function drawListAlt(list: any) {
-//   //declares overall html object to be appended to page
-//   const div = document.createElement('div');
-//   div.ariaDescription = 'object type list';
-//   div.tabIndex = 0;
-//   let elemArr: any[] = [];
-
-//   if(list.isList) {
-//     let len = lengthList(list);
-
-//     //loops through the list creating pairs and arrows for each element
-//     for(let i = 0; i < len!; i++) {
-//       //creates the container for the individual list element and the sub element that contains the list pair
-//       const col = document.createElement('div');
-//       col.className = 'vector-style';
-//       const top = document.createElement('div');
-//       top.className = 'list-style'
-
-//       //creates the list pair elements
-//       for(let j = 0; j < 2; j++) {
-//         const box = document.createElement('div');
-//         box.tabIndex = 0;
-//         if(j === 0) {
-//           box.ariaDescription = `list pair ${i}, first element contains ${list.fst}`;
-//           box.ariaLabel = `list pair ${i}, first element contains ${list.fst}`;
-//         } else {
-//           box.ariaDescription = `list pair ${i}, second element contains a list pair`;
-//           box.ariaLabel = `list pair ${i}, second element contains a list pair`;
-//         }
-//         if(i === len!-1 && j === 1) {
-//           box.className = 'null-box';
-//           box.ariaDescription = `list pair ${i}, second element contains null`;
-//           box.ariaLabel = `list pair ${i}, second element contains null`;
-//         } else {
-//           box.className = 'list-box';
-//         }
-//         top.appendChild(box);
-//       }
-
-//       //creates the arrow pointing to the next list element, if there is one
-//       if(i !== len! - 1) {
-//         const nextArrow = document.createElement('div');
-//         nextArrow.className = 'list-arrow';
-//         const arrowHead = document.createElement('div');
-//         arrowHead.className = 'arrow-box'
-//         arrowHead.textContent = '▶'
-//         top.appendChild(nextArrow);
-//         top.appendChild(arrowHead);
-//       }
-//       col.appendChild(top);
-
-//       //creates the arrow pointing to the contained element
-//       for(let j = 0; j < len! - i; j++) {
-//         const arrow = document.createElement('div');
-//         arrow.className = 'list-arrow-down'
-//         col.appendChild(arrow);
-//       }
-
-//       //creates the box containing the value in the element
-//       const val = document.createElement('div');
-//       val.className = 'val-box';
-//       val.textContent = '▼\n' + list.fst;
-//       col.appendChild(val);
-      
-//       //iterates the list
-//       list = list.snd;
-//       div.appendChild(col);
-//     }
-//   }
-//   return div;
-// }
+function keyHandler(key: any, box: HTMLElement) {
+  let loc = box.id
+  if(loc.includes('val')) {
+    if(key === 'ArrowDown') {
+      loc = `${Number(loc[0] + 1)}:0:${loc[2]} val`
+      if(document.getElementById(loc)) {
+        document.getElementById(loc)!.focus()
+      }
+    } else if(key === 'ArrowRight'){
+      loc = `${loc[0]}:${loc[2]}:${loc[4]} next`
+      if(document.getElementById(loc)) {
+        document.getElementById(loc)?.focus()
+      }
+    } else if(key === 'ArrowLeft') {
+      loc = `${loc[0]}:${Number(loc[2]) - 1}:${loc[4]} next`
+      if(document.getElementById(loc)) {
+        document.getElementById(loc)?.focus()
+      }
+    } 
+    // else if(e.key === 'ArrowUp') {
+    //   if(document.getElementById())
+    //   loc = `${Number(loc[0]) - 1}:${loc[4]}:${} val`
+    //   if(document.getElementById(loc)) {
+    //     document.getElementById(loc)?.focus()
+    //   }
+    // }
+  } else if(loc.includes('next')) {
+    if(key === 'ArrowDown') {
+      loc = `${Number(loc[0] + 1)}:0:${loc[2]} val`
+      if(document.getElementById(loc)) {
+        document.getElementById(loc)?.focus()
+      }
+    } else if(key === 'ArrowRight') {
+      loc = `${loc[0]}:${Number(loc[2]) + 1}:${loc[4]} val`
+      if(document.getElementById(loc)) {
+        document.getElementById(loc)?.focus()
+      }
+    } else if(key === 'ArrowLeft') {
+      loc = `${loc[0]}:${loc[2]}:${loc[4]} val`
+      if(document.getElementById(loc)) {
+        document.getElementById(loc)?.focus()
+      }
+    }
+  }
+}
 
 //should be called with no nesting initially
-function drawListHTML(list: any, nesting: number = 0): any {
+function drawListHTML(list: any, nesting: number = 0, parent: number = 0): any {
   //declares overall html object to be appended to page
   const div = document.createElement('div');
   div.ariaDescription = 'object type list';
@@ -988,7 +954,11 @@ function drawListHTML(list: any, nesting: number = 0): any {
       for(let j = 0; j < 2; j++) {
         const box = document.createElement('div');
         box.tabIndex = 0;
+        box.addEventListener('keydown', (e) => {
+          keyHandler(e.key, box);
+        })
         if(j === 0) {
+          box.id = `${nesting}:${i}:${parent} val`
           if(list.fst.isList) {
             box.ariaDescription = `list pair ${i}, nesting level ${nesting} first element contains another list`;
             box.ariaLabel = `list pair ${i}, nesting level ${nesting} first element contains another list`;
@@ -1000,6 +970,7 @@ function drawListHTML(list: any, nesting: number = 0): any {
             box.ariaLabel = `list pair ${i}, nesting level ${nesting} first element contains ${list.fst}`;
           }
         } else {
+          box.id = `${nesting}:${i}:${parent} next`
           box.ariaDescription = `list pair ${i}, second element contains a list pair`;
           box.ariaLabel = `list pair ${i}, second element contains a list pair`;
         }
@@ -1051,7 +1022,7 @@ function drawListHTML(list: any, nesting: number = 0): any {
         col.appendChild(val2);
       } else if (Value.isPair(el)) {
         if(el.isList) {
-          col.appendChild(drawListHTML(el, nesting + 1));
+          col.appendChild(drawListHTML(el, nesting + 1, i));
         } else {
           col.appendChild(drawPair(el));
         }
