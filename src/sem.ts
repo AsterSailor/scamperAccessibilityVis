@@ -4,7 +4,7 @@ import { renderToHTML, mkCodeElement, mkSourceBlock, renderToOutput , renderToDr
 import * as C from './contract.js'
 //@ts-ignore
 import './styles.css'
-import { makeList } from './docs/api/prelude.js'
+import { append, makeList } from './docs/api/prelude.js'
 
 let maxCallStackDepth = 100000;
 let stateHistory = [];
@@ -661,6 +661,7 @@ export function callFunction (fn: Value.Closure | Function, ...args: any): any {
 function makeTraceDiv(): HTMLElement {
   const div = document.createElement('div')
   div.classList.add('scamper-trace')
+  div.style.overflowX = 'auto'
   return div
 }
 
@@ -1202,10 +1203,6 @@ export class Sem {
       }
       if(isDrawing) {
         addScroller(this.display, this.traces[prog.length - 1])
-        // for (let i = 0; i < prog.length; i++) {
-        //   this.display.insertBefore(this.traces[i], findScroller(this.display))
-        // }
-        
       }
     } else {
       this.traces = undefined
@@ -1298,8 +1295,6 @@ export class Sem {
       }
       if(this.isDrawing) {
         this.draw()
-        //addToFrame(this.display, renderToHTML(stateToExp(this.state)!))
-        console.log(findScroller(this.display))
       }
       if (this.isTracing()) {
         this.appendToCurrentTrace(mkCodeElement(`${name} bound`))
@@ -1475,9 +1470,10 @@ export class Sem {
                 strVal
               }
               
-            //renderToDraw(this.display, e[0] + "  --->  " + strVal)
-            addToFrame(frame, HTMLVal)
+              //renderToDraw(this.display, e[0] + "  --->  " + strVal)
+              addToFrame(frame, HTMLVal)
             }
+            //this.draws![this.draws!.length - 1] = frame
           })
           //renderToDraw(this.display, "------------------------------^")
         }
@@ -1487,6 +1483,7 @@ export class Sem {
       let stackHTML;
 
       if(stack[0]) {
+        //let frame = addFrame(this.display.children.namedItem('scrolls'))
         stackString = stack[stack.length - 1]?.toString()
         if(typeof stack[0] != 'string' && typeof stack[0] != 'number' && typeof stack[0] != 'boolean') {
           if(stack[0] != undefined && Value.typeOf(stack[0]) === 'vector') {
@@ -1525,6 +1522,14 @@ export class Sem {
         }
         //renderToDraw(this.display,  ">>> " + stackString)
         //renderToDraw(this.display, stackHTML)
+        
+        
+        // const div = document.createElement('div')
+        // div.classList.add('frame')
+        // div.append(stackHTML)
+        // this.appendToCurrentTrace(div)
+        //or
+        this.appendToCurrentTrace(stackHTML)
       }
     }
     

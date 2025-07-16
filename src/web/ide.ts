@@ -23,6 +23,7 @@ const stepStmtButton = document.getElementById('step-stmt')! as HTMLButtonElemen
 const stepAllButton  = document.getElementById('step-all')! as HTMLButtonElement
 const astTextButton = document.getElementById('ast-text')! as HTMLButtonElement
 const drawButton = document.getElementById('vis-draw')! as HTMLButtonElement
+const drawBack = document.getElementById('vis-back')! as HTMLButtonElement
 
 
 class IDE {
@@ -40,15 +41,22 @@ class IDE {
     opts.isDrawing = isDrawing
     try {
       this.scamper = new Scamper(outputPane, this.getDoc(), opts)
-      if (isTracing || isDrawing) {
+      if (isTracing) {
         stepOnceButton.disabled = false
         stepStmtButton.disabled = false
         stepAllButton.disabled = false
+        if(!isDrawing) {
+          drawBack.disabled = true
+        } else {
+          drawBack.disabled = false
+        }
       } else {
         stepOnceButton.disabled = true
         stepStmtButton.disabled = true
         stepAllButton.disabled = true
+        drawBack.disabled = true
       }
+      astTextButton.disabled = false
     } catch (e) {
       renderToOutput(outputPane, e)
     }
@@ -156,6 +164,10 @@ class IDE {
       //this.scamper!.stepProgram()
       outputPane.scrollTo(0, outputPane.scrollHeight)
     })
+    drawBack.addEventListener('click', () => {
+      //this.startScamper(true, true)
+      //this.scamper!.stepProgram()
+    })
     stepButton.addEventListener('click', () => this.startScamper(true, false))
     stepOnceButton.addEventListener('click', () => {
       this.scamper!.stepProgram()
@@ -190,6 +202,8 @@ class IDE {
     stepOnceButton.disabled = true
     stepStmtButton.disabled = true
     stepAllButton.disabled = true
+    astTextButton.disabled = true
+    drawBack.disabled = true
 
     Split(['#editor', '#results'], {
       sizes: [65, 35]
