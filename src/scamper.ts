@@ -1,6 +1,7 @@
 import {Env, ParserOutput, Prog} from './lang.js'
 import * as Parser from './parser.js'
 import * as Sem from './sem.js'
+import {addScroller , addFrame } from './display.js'
 
 import builtinLibs from './lib/builtin.js'
 import Prelude from './lib/prelude.js'

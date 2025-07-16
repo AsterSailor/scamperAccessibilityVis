@@ -1,6 +1,6 @@
 import { ICE, Id, Library, Range, ScamperError, Stmt } from './lang.js'
 import { Env, Prog, Op, reservedWords, Value, } from './lang.js'
-import { renderToHTML, mkCodeElement, mkSourceBlock, renderToOutput , renderToDraw } from './display.js'
+import { renderToHTML, mkCodeElement, mkSourceBlock, renderToOutput , renderToDraw , addScroller , addFrame, addToFrame } from './display.js'
 import * as C from './contract.js'
 import './styles.css'
 import { makeList } from './docs/api/prelude.js'
@@ -662,6 +662,12 @@ function makeTraceDiv(): HTMLElement {
   return div
 }
 
+function makeDrawDiv(): HTMLElement {
+  const div = document.createElement('div')
+  div.classList.add('scamper-draw')
+  return div
+}
+
 function makeTraceHeader (s: Stmt.T): HTMLElement {
   switch (s.kind) {
     case 'binding': {
@@ -1187,61 +1193,6 @@ function drawPairHTML(pair: any): any {
      div.appendChild(col);
   }
 
-  // //declares overall html object to be appended to page
-  // const div = document.createElement('div');
-  // div.ariaDescription = 'object type list';
-  // div.tabIndex = 0;
-
-  // const col = document.createElement('div');
-  // col.className = 'vector-style';
-  // const top = document.createElement('div');
-  // top.className = 'list-style'
-  
-  // //creates the pair elements
-  // for(let j = 0; j < 2; j++) {
-  //   const box = document.createElement('div');
-  //   box.tabIndex = 0;
-  //   box.ariaDescription = `non-list pair ${i}, first element contains ${j === 0? pair.fst : pair.snd}`;
-  //   box.ariaLabel = `non-list pair ${i}, first element contains ${j === 0? pair.fst : pair.snd}`;
-  //   box.className = 'list-box';
-  //   top.appendChild(box);
-  // }
-  // col.appendChild(top);
-
-
-  //   //creates the arrow pointing to the contained element
-  //   for(let j = 0; j < 2; j++) {
-  //     const arrow = document.createElement('div');
-  //     arrow.className = 'list-arrow-down'
-  //     col.appendChild(arrow);
-  //   }
-
-  //   //creates the arrow pointing to the contained element
-  //   for(let j = 0; j < 1; j++) {
-  //     const arrow = document.createElement('div');
-  //     arrow.className = 'list-arrow-down'
-  //     col.appendChild(arrow);
-  //   }
-
-  // // if(pair.snd !== null) {
-  // //   //creates the arrow pointing to the contained element
-  // //   for(let j = 0; j < 2 - j; j++) {
-  // //     const arrow = document.createElement('div');
-  // //     arrow.className = 'list-arrow-down'
-  // //     col.appendChild(arrow);
-  // //   }
-  // // } else {
-  // //   const arrow = document.createElement('div');
-  // //   arrow.className = 'list-arrow-down'
-  // //   col.appendChild(arrow);
-  // // }
-
-  // const val = document.createElement('div');
-  // val.className = 'val-box';
-  // val.textContent = '▼\n'
-  // col.appendChild(val);
-
-  // div.appendChild(col);
   return div;
 }
 
@@ -1254,6 +1205,7 @@ export class Sem {
   state?: ExecutionState
   builtinLibs: Map<Id, Library>
   traces?: HTMLElement[]
+  draws?: HTMLElement[]
   defaultDisplay: boolean
   isPrintingCode: boolean
   isDrawing: boolean
@@ -1270,10 +1222,13 @@ export class Sem {
     this.display = display
     this.builtinLibs = builtinLibs
     this.isDrawing = isDrawing
-    if (isTracing || isDrawing) {
+    if (isTracing) {
       this.traces = new Array(prog.length)
       for (let i = 0; i < prog.length; i++) {
         this.traces[i] = makeTraceDiv()
+      }
+      if(isDrawing) {
+        if(isDrawing) addScroller(this.display, "p")
       }
     } else {
       this.traces = undefined
@@ -1504,10 +1459,10 @@ export class Sem {
     if(envState != undefined){
       let bounded = envState.getBoundsEnv(initialLibNum)
       let stack = envState.getStack()
-
+      let frame = addFrame(this.display)
       if(!stack[0]) {
         if(bounded != undefined && bounded.length > 0) {
-          renderToDraw(this.display, "------------------------------~")
+          //renderToDraw(this.display, "------------------------------~")
 
           bounded?.forEach(e => {
             let strVal: any = e[1]?.toString()
@@ -1532,11 +1487,11 @@ export class Sem {
                 strVal
               }
               
-            renderToDraw(this.display, e[0] + "  --->  " + strVal)
-            renderToDraw(this.display, HTMLVal)
+            //renderToDraw(this.display, e[0] + "  --->  " + strVal)
+            addToFrame(frame, HTMLVal)
             }
           })
-          renderToDraw(this.display, "------------------------------^")
+          //renderToDraw(this.display, "------------------------------^")
         }
       }
 
@@ -1545,8 +1500,6 @@ export class Sem {
 
       if(stack[0]) {
         stackString = stack[stack.length - 1]?.toString()
-        console.log(stack[0])
-        console.log(stackString)
         if(typeof stack[0] != 'string' && typeof stack[0] != 'number' && typeof stack[0] != 'boolean') {
           if(stack[0] != undefined && Value.typeOf(stack[0]) === 'vector') {
             stackString = drawVector(stack[0])
@@ -1579,9 +1532,10 @@ export class Sem {
             }
           }
         }
-        renderToDraw(this.display,  ">>> " + stackString)
-        renderToDraw(this.display, stackHTML)
+        //renderToDraw(this.display,  ">>> " + stackString)
+        //renderToDraw(this.display, stackHTML)
       }
     }
+    
   }
 }

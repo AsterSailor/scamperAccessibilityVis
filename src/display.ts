@@ -140,3 +140,29 @@ export function renderToDraw(output: HTMLElement, s: any) {
   //console.log("rtd")
   output!.appendChild(div)
 }
+
+export function addScroller(output: any, s: any) {
+  const div = document.createElement('div')
+  div.classList.add('scroller')
+  div.append(s? s : "")
+  //console.log("rtd")
+  output!.appendChild(div)
+}
+
+export function addFrame(output: HTMLElement, s: any = false) {
+  const div = document.createElement('div')
+  div.classList.add('frame')
+  div.append(s? s : "f")
+  //console.log("rtd")
+  const r = output.firstChild
+  r!.appendChild(div)
+  return div
+}
+
+export function addToFrame(output: HTMLElement, s: any) {
+  const div = document.createElement('div')
+  div.classList.add('scamper-output')
+  div.append(s? s : "f")
+  //console.log("rtd")
+  output!.appendChild(div)
+}
