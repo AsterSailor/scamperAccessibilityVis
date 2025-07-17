@@ -56,7 +56,7 @@ class IDE {
         stepAllButton.disabled = true
         drawBack.disabled = true
       }
-      astTextButton.disabled = false
+      
     } catch (e) {
       renderToOutput(outputPane, e)
     }
@@ -209,7 +209,6 @@ class IDE {
     stepOnceButton.disabled = true
     stepStmtButton.disabled = true
     stepAllButton.disabled = true
-    astTextButton.disabled = true
     drawBack.disabled = true
 
     Split(['#editor', '#results'], {
