@@ -732,7 +732,7 @@ function drawVector(vector: any): any {
   return str
 }
 
-function drawVectorHTML(vector: any): any {
+function drawVectorHTML(vector: any, nesting: number = 0, parent: number = 0, imgID: number = Math.random()): any {
   //Container for html elements
   let div = document.createElement('div');
   div.ariaLabel = 'object type vector';
@@ -762,6 +762,10 @@ function drawVectorHTML(vector: any): any {
     box.className = 'vector-box';
     //box.role = 'img'
     box.tabIndex = 0;
+    box.id = `${nesting}:${i}:${parent}:${imgID} val`
+    box.addEventListener('keydown', (e) => {
+      keyHandler(e.key, box, 'vector', imgID);
+    })
     if(e.isList) {
       box.ariaDescription = `vector index ${indexVal} contains a list`
       box.ariaLabel = `vector index ${indexVal} contains a list`
@@ -793,12 +797,12 @@ function drawVectorHTML(vector: any): any {
       col.appendChild(val2);
     } else if (Value.isPair(e)) {
       if(e.isList) {
-        col.appendChild(drawListHTML(e));
+        col.appendChild(drawListHTML(e, nesting + 1, i, imgID));
       } else {
         col.appendChild(drawPair(e));
       }
     } else if (Value.typeOf(e) === 'vector') {
-      col.appendChild(drawVectorHTML(e));
+      col.appendChild(drawVectorHTML(e, nesting + 1, i, imgID));
     }
      div.appendChild(col);
   })
@@ -875,22 +879,42 @@ function listHeight(list: any): number {
   return height + 1
 }
 
-function keyHandler(key: any, box: HTMLElement) {
+function keyHandler(key: any, box: HTMLElement, mode: string, imgID: number) {
   let loc = box.id
-  if(loc.includes('val')) {
+  if(mode === 'vector') {
     if(key === 'ArrowDown') {
-      loc = `${Number(loc[0] + 1)}:0:${loc[2]} val`
+      loc = `${Number(loc[0] ) + 1}:0:${loc[2]}:${imgID} val`
       if(document.getElementById(loc)) {
-        document.getElementById(loc)!.focus()
+        document.getElementById(loc)?.focus()
       }
-    } else if(key === 'ArrowRight'){
-      loc = `${loc[0]}:${loc[2]}:${loc[4]} next`
+    } else if(key === 'ArrowRight') {
+      loc = `${loc[0]}:${Number(loc[2]) + 1}:${loc[4]}:${imgID} val`
       if(document.getElementById(loc)) {
         document.getElementById(loc)?.focus()
       }
     } else if(key === 'ArrowLeft') {
-      loc = `${loc[0]}:${Number(loc[2]) - 1}:${loc[4]} next`
+      loc = `${loc[0]}:${Number(loc[2]) - 1}:${loc[4]}:${imgID} val`
       if(document.getElementById(loc)) {
+        document.getElementById(loc)?.focus()
+      }
+    }
+  } else if(loc.includes('val')) {
+    if(key === 'ArrowDown') {
+      loc = `${Number(loc[0]) + 1}:0:${loc[2]}:${imgID} val`
+      if(document.getElementById(loc)) {
+        console.log('testing')
+        document.getElementById(loc)!.focus()
+      }
+    } else if(key === 'ArrowRight'){
+      loc = `${loc[0]}:${loc[2]}:${loc[4]}:${imgID} next`
+      if(document.getElementById(loc)) {
+        console.log('testing')
+        document.getElementById(loc)?.focus()
+      }
+    } else if(key === 'ArrowLeft') {
+      loc = `${loc[0]}:${Number(loc[2]) - 1}:${loc[4]}:${imgID} next`
+      if(document.getElementById(loc)) {
+        console.log('testing')
         document.getElementById(loc)?.focus()
       }
     } 
@@ -903,17 +927,17 @@ function keyHandler(key: any, box: HTMLElement) {
     // }
   } else if(loc.includes('next')) {
     if(key === 'ArrowDown') {
-      loc = `${Number(loc[0] + 1)}:0:${loc[2]} val`
+      loc = `${Number(loc[0] + 1)}:0:${loc[2]}:${imgID} val`
       if(document.getElementById(loc)) {
         document.getElementById(loc)?.focus()
       }
     } else if(key === 'ArrowRight') {
-      loc = `${loc[0]}:${Number(loc[2]) + 1}:${loc[4]} val`
+      loc = `${loc[0]}:${Number(loc[2]) + 1}:${loc[4]}:${imgID} val`
       if(document.getElementById(loc)) {
         document.getElementById(loc)?.focus()
       }
     } else if(key === 'ArrowLeft') {
-      loc = `${loc[0]}:${loc[2]}:${loc[4]} val`
+      loc = `${loc[0]}:${loc[2]}:${loc[4]}:${imgID} val`
       if(document.getElementById(loc)) {
         document.getElementById(loc)?.focus()
       }
@@ -922,7 +946,7 @@ function keyHandler(key: any, box: HTMLElement) {
 }
 
 //should be called with no nesting initially
-function drawListHTML(list: any, nesting: number = 0, parent: number = 0): any {
+function drawListHTML(list: any, nesting: number = 0, parent: number = 0, imgID: number = Math.random()): any {
   //declares overall html object to be appended to page
   const div = document.createElement('div');
   div.ariaDescription = 'object type list';
@@ -947,10 +971,11 @@ function drawListHTML(list: any, nesting: number = 0, parent: number = 0): any {
         const box = document.createElement('div');
         box.tabIndex = 0;
         box.addEventListener('keydown', (e) => {
-          keyHandler(e.key, box);
+          console.log('testing')
+          keyHandler(e.key, box, 'list', imgID);
         })
         if(j === 0) {
-          box.id = `${nesting}:${i}:${parent} val`
+          box.id = `${nesting}:${i}:${parent}:${imgID} val`
           if(list.fst.isList) {
             box.ariaDescription = `list pair ${i}, nesting level ${nesting} first element contains another list`;
             box.ariaLabel = `list pair ${i}, nesting level ${nesting} first element contains another list`;
@@ -962,7 +987,7 @@ function drawListHTML(list: any, nesting: number = 0, parent: number = 0): any {
             box.ariaLabel = `list pair ${i}, nesting level ${nesting} first element contains ${list.fst}`;
           }
         } else {
-          box.id = `${nesting}:${i}:${parent} next`
+          box.id = `${nesting}:${i}:${parent}:${imgID} next`
           box.ariaDescription = `list pair ${i}, second element contains a list pair`;
           box.ariaLabel = `list pair ${i}, second element contains a list pair`;
         }
@@ -1014,12 +1039,12 @@ function drawListHTML(list: any, nesting: number = 0, parent: number = 0): any {
         col.appendChild(val2);
       } else if (Value.isPair(el)) {
         if(el.isList) {
-          col.appendChild(drawListHTML(el, nesting + 1, i));
+          col.appendChild(drawListHTML(el, nesting + 1, i, imgID));
         } else {
           col.appendChild(drawPair(el));
         }
       } else if (Value.typeOf(el) === 'vector') {
-        col.appendChild(drawVectorHTML(el));
+        col.appendChild(drawVectorHTML(el, nesting + 1, i, imgID));
       }
       
       //iterates the list
@@ -1086,7 +1111,7 @@ function pairHeight(pair: any) {
   return height
 }
 
-function drawPairHTML(pair: any): any {
+function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID: number = Math.random()): any {
   //Container for html elements
   let div = document.createElement('div');
   div.ariaLabel = 'object type vector';
@@ -1106,6 +1131,7 @@ function drawPairHTML(pair: any): any {
     //creates the elements for the box elements of the vector
     const box = document.createElement('div');
     box.className = 'vector-box';
+    box.id = `${nesting}:${k}:${parent}:${imgID} val`
     //box.role = 'img'
     box.tabIndex = 0;
     box.ariaDescription = `non-list pair ${k}, first element contains ${k === 0? pair.fst : pair.snd}`
@@ -1148,12 +1174,12 @@ function drawPairHTML(pair: any): any {
       col.appendChild(val2);
     } else if (Value.isPair(e)) {
       if(e.isList) {
-        col.appendChild(drawListHTML(e));
+        col.appendChild(drawListHTML(e, nesting + 1, k, imgID));
       } else {
-        col.appendChild(drawPairHTML(e));
+        col.appendChild(drawPairHTML(e, nesting + 1, k, imgID));
       }
     } else if (Value.typeOf(e) === 'vector') {
-      col.appendChild(drawVectorHTML(e));
+      col.appendChild(drawVectorHTML(e, nesting + 1, k, imgID));
     }
      div.appendChild(col);
   }
