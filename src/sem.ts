@@ -705,17 +705,18 @@ function vectorHeight(vec: any, index: number = 0): number {
       height = height + 1
     } else if(Value.isPair(e)) {
       if(e.isList) {
-        height = height + listHeight(e) + 2
+        height = height + listHeight(e) + 1
       } else {
         height = height + pairHeight(e)
       }
     } else if(Value.typeOf(e) === 'vector') {
-      height = height + vectorHeight(e, 0) + 1
+      height = height + vectorHeight(e, 0) 
     }
   }
   return height + 3
 }
 
+//ASCII
 function drawVector(vector: any): any {
   let str = ''
   vector.forEach((e: any) => {
@@ -821,6 +822,7 @@ function lengthList(lst: any, count: number = 0) {
   }
 }
 
+//ASCII
 function drawList(list: any): any {
   if(list.isList) {
     let str = '{ '
@@ -854,7 +856,7 @@ function listHeight(list: any): number {
     const fst = list.fst
     if(list.snd === null) {
       if(typeof fst === 'string' || typeof fst === 'number' || typeof fst === 'boolean') {
-        height = height + 1 //1
+        height = height + 2 //1
       } else if(Value.isPair(fst)) {
         if(fst.isList) {
           height = height + listHeight(fst) +  1
@@ -875,7 +877,7 @@ function listHeight(list: any): number {
           height = height + listHeight(list.snd) //1
         }
       } else if(Value.typeOf(fst) === 'vector') {
-        height = height + vectorHeight(fst) + listHeight(list.snd)
+        height = height + vectorHeight(fst) - 1 + listHeight(list.snd)
       }
     }
   }
@@ -1058,6 +1060,7 @@ function drawListHTML(list: any, nesting: number = 0, parent: number = 0, imgID:
   return div;
 }
 
+//ASCII
 function drawPair(pair: any): any {
   let str = ''
   let fst = pair.fst
