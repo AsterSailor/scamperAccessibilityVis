@@ -1,13 +1,11 @@
 import { ICE, Id, Library, Range, ScamperError, Stmt } from './lang.js'
 import { Env, Prog, Op, reservedWords, Value, } from './lang.js'
-import { renderToHTML, mkCodeElement, mkSourceBlock, renderToOutput , renderToDraw , addScroller , addFrame, addToFrame, findScroller } from './display.js'
+import { renderToHTML, mkCodeElement, mkSourceBlock, renderToOutput , renderToDraw } from './display.js'
 import * as C from './contract.js'
 //@ts-ignore
 import './styles.css'
-import { append, makeList } from './docs/api/prelude.js'
 
 let maxCallStackDepth = 100000;
-let stateHistory = [];
 
 ///// Machine state structures /////////////////////////////////////////////////
 
@@ -714,7 +712,7 @@ function vectorHeight(vec: any, index: number = 0): number {
       if(e.isList) {
         height = height + listHeight(e) + 2
       } else {
-        height = height + 1
+        height = height + pairHeight(e)
       }
     } else if(Value.typeOf(e) === 'vector') {
       height = height + vectorHeight(e, 0) + 1
@@ -809,7 +807,7 @@ function drawVectorHTML(vector: any, nesting: number = 0, parent: number = 0, im
       if(e.isList) {
         col.appendChild(drawListHTML(e, nesting + 1, i, imgID));
       } else {
-        col.appendChild(drawPair(e));
+        col.appendChild(drawPairHTML(e));
       }
     } else if (Value.typeOf(e) === 'vector') {
       col.appendChild(drawVectorHTML(e, nesting + 1, i, imgID));
@@ -866,7 +864,7 @@ function listHeight(list: any): number {
         if(fst.isList) {
           height = height + listHeight(fst) + 1
         } else {
-          height = height + 3 + 1
+          height = height + pairHeight(fst) + 1
         }
       } else if(Value.typeOf(fst) === 'vector') {
         height = height + vectorHeight(fst) + 1
@@ -1260,24 +1258,10 @@ export class Sem {
     this.curStmt += 1
     this.state = undefined
     if (!this.isFinished() && this.isTracing()) {
-      //if(this.isDrawing) {
-        //this.display.insertBefore(this.traces![this.curStmt]!, findScroller(this.display))
-        //let scrollVar = findScroller(this.display)
-        //scrollVar!.scrollLeft = scrollVar!.scrollWidth
-
-      //} else {
       this.display.appendChild(this.traces![this.curStmt]!)
-      //}
       this.appendToCurrentTrace(makeTraceHeader(this.prog[this.curStmt]))
       this.appendToCurrentTrace('\n')
     }
-    // console.log(this.traces)
-    // console.log(this.curStmt)
-  }
-
-  goBack() {
-    //this.curStmt -= 1
-    //this.traces = this.traces?.slice(0, this.traces.length - 1)
   }
 
   tryPrintCurrentCodeSegment(): void {
@@ -1304,8 +1288,6 @@ export class Sem {
           this.appendToCurrentTrace(' ')
           this.appendToCurrentTrace(renderToHTML(stateToExp(this.state)!))
           this.appendToCurrentTrace('\n')
-          //addToFrame(findScroller(this.display), "HYYYY")
-          
         }
       } catch (e) {
         renderToOutput(this.display, e, )
