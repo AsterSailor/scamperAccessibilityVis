@@ -595,6 +595,8 @@ function step (state: ExecutionState): void {
   var cont = false
   do {
     cont = stepPrim(state)
+    console.log("HEEEUYYYYYYLLLLLOOOOOOOOOOOOOO!!!")
+    console.log(state)
     // N.B., pop the dump until we arrive at a non-finished state
     while (state.control.isEmpty() && !state.isDumpEmpty()) {
       const ret = state.stack.pop()!
@@ -662,6 +664,7 @@ function makeTraceDiv(): HTMLElement {
   const div = document.createElement('div')
   div.classList.add('scamper-trace')
   div.style.overflowX = 'auto'
+  div.style.overflowY = 'hidden'
   return div
 }
 
@@ -1180,6 +1183,7 @@ export class Sem {
   builtinLibs: Map<Id, Library>
   traces?: HTMLElement[]
   draws?: HTMLElement[]
+  states = []
   defaultDisplay: boolean
   isPrintingCode: boolean
   isDrawing: boolean
@@ -1235,15 +1239,21 @@ export class Sem {
       if(this.isDrawing) {
         this.display.insertBefore(this.traces![this.curStmt]!, findScroller(this.display))
         let scrollVar = findScroller(this.display)
-        if(scrollVar) {
-          scrollVar.scrollLeft = scrollVar.scrollWidth
-        }
+        scrollVar!.scrollLeft = scrollVar!.scrollWidth
+
       } else {
       this.display.appendChild(this.traces![this.curStmt]!)
       }
       this.appendToCurrentTrace(makeTraceHeader(this.prog[this.curStmt]))
       this.appendToCurrentTrace('\n')
     }
+    // console.log(this.traces)
+    // console.log(this.curStmt)
+  }
+
+  goBack() {
+    //this.curStmt -= 1
+    //this.traces = this.traces?.slice(0, this.traces.length - 1)
   }
 
   tryPrintCurrentCodeSegment(): void {
@@ -1454,7 +1464,7 @@ export class Sem {
             if(strVal != undefined) {
               if(typeof e[1] === 'string' && typeof e[0] === 'number' && typeof stack[0] != 'boolean') {
                 strVal = strVal
-                HTMLVal = '-'
+                HTMLVal = e[1] + ''
               } else if (e[1] != undefined && Value.typeOf(e[1]) === 'vector') {
                 strVal = drawVector(e[1]) + ' Vetcor Height ' + (vectorHeight(e[1]) + 1)
                 HTMLVal = drawVectorHTML(e[1])
@@ -1494,6 +1504,7 @@ export class Sem {
             stackHTML = drawListHTML(stack[0])
           } else if (stack[0] != undefined && Value.isPair(stack[0])) {
             stackString = drawPair(stack[0])
+            stackHTML = drawPairHTML(stack[0])
           } else if (stack[0] != undefined && Value.isFunction(stack[0])) {
             //@ts-ignore
             if(stack[0].name) {

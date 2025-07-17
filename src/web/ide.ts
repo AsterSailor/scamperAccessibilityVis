@@ -174,6 +174,8 @@ class IDE {
       //@ts-ignore
       if(!this.scamper.isDrawing) {
         outputPane.scrollTo(0, outputPane.scrollHeight)
+      } else {
+        outputPane.scrollTo(0, outputPane.scrollHeight/2)
       }
     })
     stepStmtButton.addEventListener('click', () => {
@@ -181,6 +183,9 @@ class IDE {
       //@ts-ignore
       if(!this.scamper.isDrawing) {
         outputPane.scrollTo(0, outputPane.scrollHeight)
+      } else {
+        outputPane.scrollTo(0, outputPane.scrollHeight/2)
+        display.findScroller(this.display)
       }
     })
     stepAllButton.addEventListener('click', () => {
@@ -188,6 +193,8 @@ class IDE {
       //@ts-ignore
       if(!this.scamper.isDrawing) {
         outputPane.scrollTo(0, outputPane.scrollHeight)
+      } else {
+        outputPane.scrollTo(0, outputPane.scrollHeight/2)
       }
     })
     astTextButton.addEventListener('click', () => {
