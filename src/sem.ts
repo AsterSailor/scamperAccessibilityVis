@@ -664,11 +664,6 @@ function makeTraceDiv(): HTMLElement {
   return div
 }
 
-function makeDrawDiv(): HTMLElement {
-  const div = document.createElement('div')
-  div.classList.add('scamper-draw')
-  return div
-}
 
 function makeTraceHeader (s: Stmt.T): HTMLElement {
   switch (s.kind) {
@@ -862,12 +857,12 @@ function listHeight(list: any): number {
         height = height + 1 //1
       } else if(Value.isPair(fst)) {
         if(fst.isList) {
-          height = height + listHeight(fst) + 1
+          height = height + listHeight(fst) +  1
         } else {
-          height = height + pairHeight(fst) + 1
+          height = height + pairHeight(fst)
         }
       } else if(Value.typeOf(fst) === 'vector') {
-        height = height + vectorHeight(fst) + 1
+        height = height + vectorHeight(fst)
       }
     } else {
       //const next = list.snd.fst;
@@ -1049,7 +1044,7 @@ function drawListHTML(list: any, nesting: number = 0, parent: number = 0, imgID:
         if(el.isList) {
           col.appendChild(drawListHTML(el, nesting + 1, i, imgID));
         } else {
-          col.appendChild(drawPair(el));
+          col.appendChild(drawPairHTML(el));
         }
       } else if (Value.typeOf(el) === 'vector') {
         col.appendChild(drawVectorHTML(el, nesting + 1, i, imgID));
@@ -1470,47 +1465,43 @@ export class Sem {
           bounded?.forEach(e => {
             let strVal: any = e[1]?.toString()
             let HTMLVal: any = ''
-            let elementHeight = 0
+            let ariaType = ""
 
             if(strVal != undefined) {
               if(typeof e[1] === 'string' || typeof e[1] === 'number' || typeof stack[1] === 'boolean') {
                 strVal = strVal
                 HTMLVal = e[1] + ''
                 if(typeof e[1] === 'string') HTMLVal = "\"" + e[1] + "\""
+                ariaType = typeof e[1]
               } else if (e[1] != undefined && Value.typeOf(e[1]) === 'vector') {
                 strVal = drawVector(e[1]) + ' Vetcor Height ' + (vectorHeight(e[1]) + 1)
                 HTMLVal = drawVectorHTML(e[1])
-                elementHeight = vectorHeight(e[1])
+                ariaType = "vector"
               } else if (e[1] != undefined && Value.typeOf(e[1]) === 'list') {
                 strVal = drawList(e[1]) + ' List Height == ' + (listHeight(e[1]) + 1)
                 HTMLVal = drawListHTML(e[1])
-                elementHeight = listHeight(e[1])
+                ariaType = "list"
               } else if (e[1] != undefined && Value.isPair(e[1])) {
                 strVal = drawPair(e[1])
                 HTMLVal = drawPairHTML(e[1])
-                elementHeight = pairHeight(e[1])
+                ariaType = "pair"
               } else if (e[1] != undefined && Value.isFunction(e[1])) {
                 strVal = ("PROCEDURE")
+                ariaType = "procedure"
               } else {
                 strVal
               }
               
-              //renderToDraw(this.display, e[0] + "  --->  " + strVal)
-              //addToFrame(frame, HTMLVal)
               let div = document.createElement('div')
               div.ariaLabel = "End environment"
               div.ariaDescription = "End environment"
               div.textContent = e[0] + ' → '
               div.style.display = 'flex'
-
-              // for(let i = 1; i < elementHeight; i++) {
-              //   div.textContent += "\n"
-              // }
+              div.ariaLabel = e[0] + "points to " + ariaType
+              div.ariaDescription = e[0] + "points to " + ariaType
               div.append(HTMLVal)
               renderToDraw(this.display, div)
-              //renderToDraw(this.display, HTMLVal)
             }
-            //this.draws![this.draws!.length - 1] = frame
           })
 
           let div2 = document.createElement('div')
@@ -1563,15 +1554,6 @@ export class Sem {
             }
           }
         }
-        //renderToDraw(this.display,  ">>> " + stackString)
-        //renderToDraw(this.display, stackHTML)
-        
-        
-        // const div = document.createElement('div')
-        // div.classList.add('frame')
-        // div.append(stackHTML)
-        // this.appendToCurrentTrace(div)
-        //or
         this.appendToCurrentTrace(stackHTML)
       }
     }
