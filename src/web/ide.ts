@@ -159,7 +159,7 @@ class IDE {
     })
     stepButton.addEventListener('click', () => this.startScamper(true, false))
     window.addEventListener("keydown", (event) => {
-      if(event.key === 's' && event.ctrlKey === true) {
+      if(event.key === '[' && event.ctrlKey) {
         this.scamper!.stepProgram()
         outputPane.scrollTo(0, outputPane.scrollHeight)
       }
@@ -169,7 +169,7 @@ class IDE {
       outputPane.scrollTo(0, outputPane.scrollHeight)
     })
     window.addEventListener("keydown", (event) => {
-      if(event.key === 'd' && event.ctrlKey === true) {
+      if(event.key === ']' && event.ctrlKey) {
         this.scamper!.stepStmtProgram()
         outputPane.scrollTo(0, outputPane.scrollHeight)
       }
@@ -179,7 +179,7 @@ class IDE {
       outputPane.scrollTo(0, outputPane.scrollHeight)
     })
     window.addEventListener("keydown", (event) => {
-      if(event.key === 'f' && event.ctrlKey === true) {
+      if(event.key === "\\" && event.ctrlKey) {
         this.scamper!.runProgram()
         outputPane.scrollTo(0, outputPane.scrollHeight)
       }
