@@ -1470,20 +1470,25 @@ export class Sem {
           bounded?.forEach(e => {
             let strVal: any = e[1]?.toString()
             let HTMLVal: any = ''
+            let elementHeight = 0
 
             if(strVal != undefined) {
-              if(typeof e[1] === 'string' && typeof e[0] === 'number' && typeof stack[0] != 'boolean') {
+              if(typeof e[1] === 'string' || typeof e[1] === 'number' || typeof stack[1] === 'boolean') {
                 strVal = strVal
                 HTMLVal = e[1] + ''
+                if(typeof e[1] === 'string') HTMLVal = "\"" + e[1] + "\""
               } else if (e[1] != undefined && Value.typeOf(e[1]) === 'vector') {
                 strVal = drawVector(e[1]) + ' Vetcor Height ' + (vectorHeight(e[1]) + 1)
                 HTMLVal = drawVectorHTML(e[1])
+                elementHeight = vectorHeight(e[1])
               } else if (e[1] != undefined && Value.typeOf(e[1]) === 'list') {
                 strVal = drawList(e[1]) + ' List Height == ' + (listHeight(e[1]) + 1)
                 HTMLVal = drawListHTML(e[1])
+                elementHeight = listHeight(e[1])
               } else if (e[1] != undefined && Value.isPair(e[1])) {
                 strVal = drawPair(e[1])
                 HTMLVal = drawPairHTML(e[1])
+                elementHeight = pairHeight(e[1])
               } else if (e[1] != undefined && Value.isFunction(e[1])) {
                 strVal = ("PROCEDURE")
               } else {
@@ -1492,7 +1497,18 @@ export class Sem {
               
               //renderToDraw(this.display, e[0] + "  --->  " + strVal)
               //addToFrame(frame, HTMLVal)
-              renderToDraw(this.display, HTMLVal)
+              let div = document.createElement('div')
+              div.ariaLabel = "End environment"
+              div.ariaDescription = "End environment"
+              div.textContent = e[0] + ' → '
+              div.style.display = 'flex'
+
+              // for(let i = 1; i < elementHeight; i++) {
+              //   div.textContent += "\n"
+              // }
+              div.append(HTMLVal)
+              renderToDraw(this.display, div)
+              //renderToDraw(this.display, HTMLVal)
             }
             //this.draws![this.draws!.length - 1] = frame
           })
