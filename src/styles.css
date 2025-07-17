@@ -125,3 +125,26 @@
     flex-direction: column;
     justify-content: flex-start;
 }
+
+.scroller {
+    width: 300;
+    height: 500;
+    padding: 20px;
+    display: flex;
+    gap: 4vw;
+    overflow-x: scroll;
+    scroll-snap-type: x mandatory;
+}
+
+.frame {
+    width: 50;
+    height: 50;
+    list-style-type: none;
+    background-color: #f8f8f8;
+    border: 1px solid #a0a0a0;
+    padding: 20px;
+    overflow: auto;
+  
+    flex: 1 0 100%;
+    scroll-snap-align: center;
+}

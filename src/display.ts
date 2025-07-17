@@ -126,11 +126,16 @@ export function renderToHTML (v: Value.T): HTMLElement {
   }
 }
 
-export function renderToOutput(output: HTMLElement, v: any) {
+export function renderToOutput(output: HTMLElement, v: any, s: any = "spookie") {
   const div = document.createElement('div')
   div.classList.add('scamper-output')
   div.appendChild(renderToHTML(v))
-  output!.appendChild(div)
+  //if(s === "spookie") {
+    output!.appendChild(div)
+  // } else {
+  //   output.insertBefore(div, s)
+  // }
+  
 }
 
 export function renderToDraw(output: HTMLElement, s: any) {
@@ -139,4 +144,38 @@ export function renderToDraw(output: HTMLElement, s: any) {
   div.append(s? s : "")
   //console.log("rtd")
   output!.appendChild(div)
+}
+
+export function addScroller(output: any, s: any) {
+  const div = document.createElement('div')
+  div.classList.add('scroller')
+  div.id = 'scrolls'
+  div.append('')
+  //console.log("rtd")
+  output.last
+  output!.appendChild(div)
+  //output!.insertBefore(div, s)
+  console.log(output.children)
+}
+
+export function addFrame(output: HTMLElement, s: any = false) {
+  const div = document.createElement('div')
+  div.classList.add('frame')
+  //div.append(s? s : "")
+  //console.log("rtd")
+  const r = output//.children.namedItem('scrolls')
+  output!.appendChild(div)
+  return div
+}
+
+export function addToFrame(output: HTMLElement, s: any) {
+  const div = document.createElement('div')
+  div.classList.add('scamper-output')
+  div.append(s? s : "")
+  //console.log("rtd")
+  output!.appendChild(div)
+}
+
+export function findScroller(output: HTMLElement) {
+  return output.children.namedItem('scrolls')
 }

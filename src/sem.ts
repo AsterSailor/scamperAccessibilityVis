@@ -1,11 +1,13 @@
 import { ICE, Id, Library, Range, ScamperError, Stmt } from './lang.js'
 import { Env, Prog, Op, reservedWords, Value, } from './lang.js'
-import { renderToHTML, mkCodeElement, mkSourceBlock, renderToOutput , renderToDraw } from './display.js'
+import { renderToHTML, mkCodeElement, mkSourceBlock, renderToOutput , renderToDraw , addScroller , addFrame, addToFrame, findScroller } from './display.js'
 import * as C from './contract.js'
+//@ts-ignore
 import './styles.css'
-import { makeList } from './docs/api/prelude.js'
+import { append, makeList } from './docs/api/prelude.js'
 
 let maxCallStackDepth = 100000;
+let stateHistory = [];
 
 ///// Machine state structures /////////////////////////////////////////////////
 
@@ -659,6 +661,14 @@ export function callFunction (fn: Value.Closure | Function, ...args: any): any {
 function makeTraceDiv(): HTMLElement {
   const div = document.createElement('div')
   div.classList.add('scamper-trace')
+  div.style.overflowX = 'auto'
+  div.style.overflowY = 'hidden'
+  return div
+}
+
+function makeDrawDiv(): HTMLElement {
+  const div = document.createElement('div')
+  div.classList.add('scamper-draw')
   return div
 }
 
@@ -1153,7 +1163,7 @@ function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID:
         height = height + vectorHeight(snd)
       }
     }
-    console.log(height)
+
     //creates the arrow element for the vector
     for(let j=0; j < height; j++) {
       const arrow = document.createElement('div');
@@ -1184,61 +1194,6 @@ function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID:
      div.appendChild(col);
   }
 
-  // //declares overall html object to be appended to page
-  // const div = document.createElement('div');
-  // div.ariaDescription = 'object type list';
-  // div.tabIndex = 0;
-
-  // const col = document.createElement('div');
-  // col.className = 'vector-style';
-  // const top = document.createElement('div');
-  // top.className = 'list-style'
-  
-  // //creates the pair elements
-  // for(let j = 0; j < 2; j++) {
-  //   const box = document.createElement('div');
-  //   box.tabIndex = 0;
-  //   box.ariaDescription = `non-list pair ${i}, first element contains ${j === 0? pair.fst : pair.snd}`;
-  //   box.ariaLabel = `non-list pair ${i}, first element contains ${j === 0? pair.fst : pair.snd}`;
-  //   box.className = 'list-box';
-  //   top.appendChild(box);
-  // }
-  // col.appendChild(top);
-
-
-  //   //creates the arrow pointing to the contained element
-  //   for(let j = 0; j < 2; j++) {
-  //     const arrow = document.createElement('div');
-  //     arrow.className = 'list-arrow-down'
-  //     col.appendChild(arrow);
-  //   }
-
-  //   //creates the arrow pointing to the contained element
-  //   for(let j = 0; j < 1; j++) {
-  //     const arrow = document.createElement('div');
-  //     arrow.className = 'list-arrow-down'
-  //     col.appendChild(arrow);
-  //   }
-
-  // // if(pair.snd !== null) {
-  // //   //creates the arrow pointing to the contained element
-  // //   for(let j = 0; j < 2 - j; j++) {
-  // //     const arrow = document.createElement('div');
-  // //     arrow.className = 'list-arrow-down'
-  // //     col.appendChild(arrow);
-  // //   }
-  // // } else {
-  // //   const arrow = document.createElement('div');
-  // //   arrow.className = 'list-arrow-down'
-  // //   col.appendChild(arrow);
-  // // }
-
-  // const val = document.createElement('div');
-  // val.className = 'val-box';
-  // val.textContent = '▼\n'
-  // col.appendChild(val);
-
-  // div.appendChild(col);
   return div;
 }
 
@@ -1251,6 +1206,8 @@ export class Sem {
   state?: ExecutionState
   builtinLibs: Map<Id, Library>
   traces?: HTMLElement[]
+  draws?: HTMLElement[]
+  states = []
   defaultDisplay: boolean
   isPrintingCode: boolean
   isDrawing: boolean
@@ -1267,10 +1224,13 @@ export class Sem {
     this.display = display
     this.builtinLibs = builtinLibs
     this.isDrawing = isDrawing
-    if (isTracing || isDrawing) {
+    if (isTracing) {
       this.traces = new Array(prog.length)
       for (let i = 0; i < prog.length; i++) {
         this.traces[i] = makeTraceDiv()
+      }
+      if(isDrawing) {
+        //addScroller(this.display, this.traces[prog.length - 1])
       }
     } else {
       this.traces = undefined
@@ -1300,10 +1260,24 @@ export class Sem {
     this.curStmt += 1
     this.state = undefined
     if (!this.isFinished() && this.isTracing()) {
+      //if(this.isDrawing) {
+        //this.display.insertBefore(this.traces![this.curStmt]!, findScroller(this.display))
+        //let scrollVar = findScroller(this.display)
+        //scrollVar!.scrollLeft = scrollVar!.scrollWidth
+
+      //} else {
       this.display.appendChild(this.traces![this.curStmt]!)
+      //}
       this.appendToCurrentTrace(makeTraceHeader(this.prog[this.curStmt]))
       this.appendToCurrentTrace('\n')
     }
+    // console.log(this.traces)
+    // console.log(this.curStmt)
+  }
+
+  goBack() {
+    //this.curStmt -= 1
+    //this.traces = this.traces?.slice(0, this.traces.length - 1)
   }
 
   tryPrintCurrentCodeSegment(): void {
@@ -1330,12 +1304,12 @@ export class Sem {
           this.appendToCurrentTrace(' ')
           this.appendToCurrentTrace(renderToHTML(stateToExp(this.state)!))
           this.appendToCurrentTrace('\n')
+          //addToFrame(findScroller(this.display), "HYYYY")
           
         }
       } catch (e) {
-        renderToOutput(this.display, e)
+        renderToOutput(this.display, e, )
         this.advance()
-        if(this.isDrawing) {this.draw()}
       }
     } else {
       if (this.state.stack.length !== 1) {
@@ -1501,9 +1475,10 @@ export class Sem {
     if(envState != undefined){
       let bounded = envState.getBoundsEnv(initialLibNum)
       let stack = envState.getStack()
-
       if(!stack[0]) {
         if(bounded != undefined && bounded.length > 0) {
+          //@ts-ignore
+          //let frame = addFrame(this.display.children.namedItem('scrolls'))
           renderToDraw(this.display, "------------------------------~")
 
           bounded?.forEach(e => {
@@ -1513,7 +1488,7 @@ export class Sem {
             if(strVal != undefined) {
               if(typeof e[1] === 'string' && typeof e[0] === 'number' && typeof stack[0] != 'boolean') {
                 strVal = strVal
-                HTMLVal = '-'
+                HTMLVal = e[1] + ''
               } else if (e[1] != undefined && Value.typeOf(e[1]) === 'vector') {
                 strVal = drawVector(e[1]) + ' Vetcor Height ' + (vectorHeight(e[1]) + 1)
                 HTMLVal = drawVectorHTML(e[1])
@@ -1529,9 +1504,11 @@ export class Sem {
                 strVal
               }
               
-            renderToDraw(this.display, e[0] + "  --->  " + strVal)
-            renderToDraw(this.display, HTMLVal)
+              //renderToDraw(this.display, e[0] + "  --->  " + strVal)
+              //addToFrame(frame, HTMLVal)
+              renderToDraw(this.display, HTMLVal)
             }
+            //this.draws![this.draws!.length - 1] = frame
           })
           renderToDraw(this.display, "------------------------------^")
         }
@@ -1541,9 +1518,8 @@ export class Sem {
       let stackHTML;
 
       if(stack[0]) {
+        //let frame = addFrame(this.display.children.namedItem('scrolls'))
         stackString = stack[stack.length - 1]?.toString()
-        console.log(stack[0])
-        console.log(stackString)
         if(typeof stack[0] != 'string' && typeof stack[0] != 'number' && typeof stack[0] != 'boolean') {
           if(stack[0] != undefined && Value.typeOf(stack[0]) === 'vector') {
             stackString = drawVector(stack[0])
@@ -1553,8 +1529,11 @@ export class Sem {
             stackHTML = drawListHTML(stack[0])
           } else if (stack[0] != undefined && Value.isPair(stack[0])) {
             stackString = drawPair(stack[0])
+            stackHTML = drawPairHTML(stack[0])
           } else if (stack[0] != undefined && Value.isFunction(stack[0])) {
+            //@ts-ignore
             if(stack[0].name) {
+              //@ts-ignore
               if(stack[0].name === 'cons') {
                 let last: any = stack[stack.length - 1]
                 if(last.snd === null) {
@@ -1567,6 +1546,7 @@ export class Sem {
                   stackString = drawPair(Value.mkPair(last.fst, last.snd))
                   stackHTML = drawPairHTML(Value.mkPair(last.fst, last.snd))
                 }
+                //@ts-ignore
               } else if(stack[0].name === 'map') {
                 //forEachstack.push(Value.mkList)
                 console.log("mapping")
@@ -1576,9 +1556,18 @@ export class Sem {
             }
           }
         }
-        renderToDraw(this.display,  ">>> " + stackString)
-        renderToDraw(this.display, stackHTML)
+        //renderToDraw(this.display,  ">>> " + stackString)
+        //renderToDraw(this.display, stackHTML)
+        
+        
+        // const div = document.createElement('div')
+        // div.classList.add('frame')
+        // div.append(stackHTML)
+        // this.appendToCurrentTrace(div)
+        //or
+        this.appendToCurrentTrace(stackHTML)
       }
     }
+    
   }
 }
