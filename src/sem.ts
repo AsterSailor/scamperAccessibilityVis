@@ -595,8 +595,6 @@ function step (state: ExecutionState): void {
   var cont = false
   do {
     cont = stepPrim(state)
-    console.log("HEEEUYYYYYYLLLLLOOOOOOOOOOOOOO!!!")
-    console.log(state)
     // N.B., pop the dump until we arrive at a non-finished state
     while (state.control.isEmpty() && !state.isDumpEmpty()) {
       const ret = state.stack.pop()!
@@ -1206,7 +1204,7 @@ export class Sem {
         this.traces[i] = makeTraceDiv()
       }
       if(isDrawing) {
-        addScroller(this.display, this.traces[prog.length - 1])
+        //addScroller(this.display, this.traces[prog.length - 1])
       }
     } else {
       this.traces = undefined
@@ -1236,14 +1234,14 @@ export class Sem {
     this.curStmt += 1
     this.state = undefined
     if (!this.isFinished() && this.isTracing()) {
-      if(this.isDrawing) {
-        this.display.insertBefore(this.traces![this.curStmt]!, findScroller(this.display))
-        let scrollVar = findScroller(this.display)
-        scrollVar!.scrollLeft = scrollVar!.scrollWidth
+      //if(this.isDrawing) {
+        //this.display.insertBefore(this.traces![this.curStmt]!, findScroller(this.display))
+        //let scrollVar = findScroller(this.display)
+        //scrollVar!.scrollLeft = scrollVar!.scrollWidth
 
-      } else {
+      //} else {
       this.display.appendChild(this.traces![this.curStmt]!)
-      }
+      //}
       this.appendToCurrentTrace(makeTraceHeader(this.prog[this.curStmt]))
       this.appendToCurrentTrace('\n')
     }
@@ -1454,8 +1452,8 @@ export class Sem {
       if(!stack[0]) {
         if(bounded != undefined && bounded.length > 0) {
           //@ts-ignore
-          let frame = addFrame(this.display.children.namedItem('scrolls'))
-          //renderToDraw(this.display, "------------------------------~")
+          //let frame = addFrame(this.display.children.namedItem('scrolls'))
+          renderToDraw(this.display, "------------------------------~")
 
           bounded?.forEach(e => {
             let strVal: any = e[1]?.toString()
@@ -1481,11 +1479,12 @@ export class Sem {
               }
               
               //renderToDraw(this.display, e[0] + "  --->  " + strVal)
-              addToFrame(frame, HTMLVal)
+              //addToFrame(frame, HTMLVal)
+              renderToDraw(this.display, HTMLVal)
             }
             //this.draws![this.draws!.length - 1] = frame
           })
-          //renderToDraw(this.display, "------------------------------^")
+          renderToDraw(this.display, "------------------------------^")
         }
       }
 

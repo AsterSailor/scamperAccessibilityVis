@@ -130,11 +130,11 @@ export function renderToOutput(output: HTMLElement, v: any, s: any = "spookie") 
   const div = document.createElement('div')
   div.classList.add('scamper-output')
   div.appendChild(renderToHTML(v))
-  if(s === "spookie") {
+  //if(s === "spookie") {
     output!.appendChild(div)
-  } else {
-    output.insertBefore(div, s)
-  }
+  // } else {
+  //   output.insertBefore(div, s)
+  // }
   
 }
 

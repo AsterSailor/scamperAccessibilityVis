@@ -174,28 +174,28 @@ class IDE {
       //@ts-ignore
       if(!this.scamper.isDrawing) {
         outputPane.scrollTo(0, outputPane.scrollHeight)
-      } else {
-        outputPane.scrollTo(0, outputPane.scrollHeight/2)
-      }
+      } //else {
+      //   outputPane.scrollTo(0, outputPane.scrollHeight/2)
+      // }
     })
     stepStmtButton.addEventListener('click', () => {
       this.scamper!.stepStmtProgram()
       //@ts-ignore
       if(!this.scamper.isDrawing) {
         outputPane.scrollTo(0, outputPane.scrollHeight)
-      } else {
+      } //else {
         outputPane.scrollTo(0, outputPane.scrollHeight/2)
-        display.findScroller(this.display)
-      }
+        //display.findScroller(this.display)
+      //}
     })
     stepAllButton.addEventListener('click', () => {
       this.scamper!.runProgram()
       //@ts-ignore
       if(!this.scamper.isDrawing) {
         outputPane.scrollTo(0, outputPane.scrollHeight)
-      } else {
-        outputPane.scrollTo(0, outputPane.scrollHeight/2)
-      }
+      } //else {
+      //   outputPane.scrollTo(0, outputPane.scrollHeight/2)
+      // }
     })
     astTextButton.addEventListener('click', () => {
       this.showASTText()
