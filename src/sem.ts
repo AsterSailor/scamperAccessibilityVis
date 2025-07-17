@@ -1453,7 +1453,11 @@ export class Sem {
         if(bounded != undefined && bounded.length > 0) {
           //@ts-ignore
           //let frame = addFrame(this.display.children.namedItem('scrolls'))
-          renderToDraw(this.display, "------------------------------~")
+          let div1 = document.createElement('div')
+          div1.ariaLabel = "Begin environment"
+          div1.ariaDescription = "Begin environment"
+          div1.textContent = "------------------------------~"
+          renderToDraw(this.display, div1)
 
           bounded?.forEach(e => {
             let strVal: any = e[1]?.toString()
@@ -1484,7 +1488,12 @@ export class Sem {
             }
             //this.draws![this.draws!.length - 1] = frame
           })
-          renderToDraw(this.display, "------------------------------^")
+
+          let div2 = document.createElement('div')
+          div2.ariaLabel = "End environment"
+          div2.ariaDescription = "End environment"
+          div2.textContent = "------------------------------~"
+          renderToDraw(this.display, div2)
         }
       }
 
