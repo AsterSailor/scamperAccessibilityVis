@@ -656,11 +656,12 @@ export function callFunction (fn: Value.Closure | Function, ...args: any): any {
   }
 }
 
-function makeTraceDiv(): HTMLElement {
+function makeTraceDiv(num: number): HTMLElement {
   const div = document.createElement('div')
   div.classList.add('scamper-trace')
   div.style.overflowX = 'auto'
   div.style.overflowY = 'hidden'
+  div.ariaLabel = "Step " + num
   return div
 }
 
@@ -874,7 +875,7 @@ function listHeight(list: any): number {
         if(fst.isList) {
           height = height + listHeight(fst) + listHeight(list.snd) //1
         } else {
-          height = height + listHeight(list.snd) //1
+          height = height + pairHeight(fst) + listHeight(list.snd) //1
         }
       } else if(Value.typeOf(fst) === 'vector') {
         height = height + vectorHeight(fst) - 1 + listHeight(list.snd)
@@ -1111,7 +1112,7 @@ function pairHeight(pair: any) {
       height = height + pairHeight(fst)
     }
   } else if (Value.typeOf(fst) === 'vector') {
-    height = height + vectorHeight(fst)
+    height = height + vectorHeight(fst) - 1
   }
 
   return height
@@ -1223,7 +1224,7 @@ export class Sem {
     if (isTracing) {
       this.traces = new Array(prog.length)
       for (let i = 0; i < prog.length; i++) {
-        this.traces[i] = makeTraceDiv()
+        this.traces[i] = makeTraceDiv(i)
       }
       if(isDrawing) {
         //addScroller(this.display, this.traces[prog.length - 1])
@@ -1491,6 +1492,7 @@ export class Sem {
               } else if (e[1] != undefined && Value.isFunction(e[1])) {
                 strVal = ("PROCEDURE")
                 ariaType = "procedure"
+                HTMLVal = "PROCEDURE"
               } else {
                 strVal
               }
@@ -1519,7 +1521,6 @@ export class Sem {
       let stackHTML;
 
       if(stack[0]) {
-        //let frame = addFrame(this.display.children.namedItem('scrolls'))
         stackString = stack[stack.length - 1]?.toString()
         if(typeof stack[0] != 'string' && typeof stack[0] != 'number' && typeof stack[0] != 'boolean') {
           if(stack[0] != undefined && Value.typeOf(stack[0]) === 'vector') {
@@ -1554,10 +1555,13 @@ export class Sem {
               }
             } else {
               stackString = ("PROCEDURE")
+              
             }
           }
         }
-        this.appendToCurrentTrace(stackHTML)
+        if(stackHTML){
+          this.appendToCurrentTrace(stackHTML)
+        }
       }
     }
     
