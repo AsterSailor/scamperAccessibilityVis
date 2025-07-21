@@ -1208,6 +1208,7 @@ export class Sem {
   defaultDisplay: boolean
   isPrintingCode: boolean
   isDrawing: boolean
+  jumpToList?: HTMLElement[]
 
   constructor (display: HTMLElement,
                builtinLibs: Map<Id, Library>,
@@ -1227,7 +1228,7 @@ export class Sem {
         this.traces[i] = makeTraceDiv(i)
       }
       if(isDrawing) {
-        //addScroller(this.display, this.traces[prog.length - 1])
+        this.jumpToList = []
       }
     } else {
       this.traces = undefined
@@ -1472,7 +1473,16 @@ export class Sem {
           div1.ariaLabel = "Begin environment"
           div1.ariaDescription = "Begin environment"
           div1.textContent = "------------------------------~"
+          div1.tabIndex = 0
+          div1.addEventListener('keydown', (event) => {
+            if(event.key === 'j' && event.ctrlKey) {
+              if(this.jumpToList![this.jumpToList!.indexOf(div1) + 1]) {
+                this.jumpToList![this.jumpToList!.indexOf(div1) + 1].focus()
+             }
+            }
+          })
           renderToDraw(this.display, div1)
+          this.jumpToList?.push(div1)
 
           //for each bounded variable
           bounded?.forEach(e => {
@@ -1487,8 +1497,11 @@ export class Sem {
             if(strVal != undefined) {
               if(typeof e[1] === 'string' || typeof e[1] === 'number' || typeof stack[1] === 'boolean') {
                 strVal = strVal
-                HTMLVal = e[1] + ''
-                if(typeof e[1] === 'string') HTMLVal = "\"" + e[1] + "\""
+                if(typeof e[1] === 'string'){
+                  HTMLVal = "\"" + e[1] + "\""
+                } else {
+                  HTMLVal = e[1] + ''
+                }
                 ariaType = typeof e[1]
               } else if (e[1] != undefined && Value.typeOf(e[1]) === 'vector') {
                 strVal = drawVector(e[1]) + ' Vetcor Height ' + (vectorHeight(e[1]) + 1)
@@ -1510,15 +1523,25 @@ export class Sem {
                 strVal
               }
               
+
               //draw
               let div = document.createElement('div')
               div.textContent = e[0] + ' → '
               div.style.display = 'flex'
-              div.ariaLabel = e[0] + "points to " + ariaType
-              div.ariaDescription = e[0] + "points to " + ariaType
+              div.ariaLabel = e[0] + " points to " + ariaType
+              div.ariaDescription = e[0] + " points to " + ariaType
               div.append(HTMLVal)
+              this.jumpToList!.push(HTMLVal)
+              div.addEventListener('keydown', (event) => {
+                    if(event.key === 'j' && event.ctrlKey) {
+                      if(this.jumpToList![this.jumpToList!.indexOf(HTMLVal) + 1]) {
+                        this.jumpToList![this.jumpToList!.indexOf(HTMLVal) + 1].focus()
+                     }
+                    }
+                  })
               renderToDraw(this.display, div)
             }
+            console.log(this.jumpToList)
           })
 
           //environment end line
@@ -1526,6 +1549,7 @@ export class Sem {
           div2.ariaLabel = "End environment"
           div2.ariaDescription = "End environment"
           div2.textContent = "------------------------------~"
+          div2.tabIndex = 0
           renderToDraw(this.display, div2)
         }
       }

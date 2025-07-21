@@ -197,6 +197,7 @@ class IDE {
       window.open(`runner.html?${params.toString()}`)
     })
     
+    
     stepOnceButton.disabled = true
     stepStmtButton.disabled = true
     stepAllButton.disabled = true
