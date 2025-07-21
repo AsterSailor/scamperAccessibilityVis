@@ -1454,23 +1454,36 @@ export class Sem {
     })
 
     if(envState != undefined){
+
+      //grabs bounded values from the environment
       let bounded = envState.getBoundsEnv(initialLibNum)
+
+      //grabs the stack
       let stack = envState.getStack()
+
+      //if the stack is empty
       if(!stack[0]) {
+
+        //and bounded variables exist
         if(bounded != undefined && bounded.length > 0) {
-          //@ts-ignore
-          //let frame = addFrame(this.display.children.namedItem('scrolls'))
+          
+          //environment begin line
           let div1 = document.createElement('div')
           div1.ariaLabel = "Begin environment"
           div1.ariaDescription = "Begin environment"
           div1.textContent = "------------------------------~"
           renderToDraw(this.display, div1)
 
+          //for each bounded variable
           bounded?.forEach(e => {
+
+            //convert to string
             let strVal: any = e[1]?.toString()
+
             let HTMLVal: any = ''
             let ariaType = ""
 
+            //typecheck the variable(s) and convert to string or HTML elements
             if(strVal != undefined) {
               if(typeof e[1] === 'string' || typeof e[1] === 'number' || typeof stack[1] === 'boolean') {
                 strVal = strVal
@@ -1497,9 +1510,8 @@ export class Sem {
                 strVal
               }
               
+              //draw
               let div = document.createElement('div')
-              div.ariaLabel = "End environment"
-              div.ariaDescription = "End environment"
               div.textContent = e[0] + ' → '
               div.style.display = 'flex'
               div.ariaLabel = e[0] + "points to " + ariaType
@@ -1509,6 +1521,7 @@ export class Sem {
             }
           })
 
+          //environment end line
           let div2 = document.createElement('div')
           div2.ariaLabel = "End environment"
           div2.ariaDescription = "End environment"
@@ -1520,8 +1533,12 @@ export class Sem {
       let stackString;
       let stackHTML;
 
+      //if there is anything in the stack
       if(stack[0]) {
+        //convert to string (probs not used)
         stackString = stack[stack.length - 1]?.toString()
+
+        //type check and convert to string or HTML element
         if(typeof stack[0] != 'string' && typeof stack[0] != 'number' && typeof stack[0] != 'boolean') {
           if(stack[0] != undefined && Value.typeOf(stack[0]) === 'vector') {
             stackString = drawVector(stack[0])
@@ -1548,18 +1565,20 @@ export class Sem {
                   stackString = drawPair(Value.mkPair(last.fst, last.snd))
                   stackHTML = drawPairHTML(Value.mkPair(last.fst, last.snd))
                 }
+
+                //attempt at drawing map (ignore)
                 //@ts-ignore
               } else if(stack[0].name === 'map') {
                 //forEachstack.push(Value.mkList)
                 console.log("mapping")
               }
-            } else {
+            } else {//catch
               stackString = ("PROCEDURE")
               
             }
           }
         }
-        if(stackHTML){
+        if(stackHTML){//if there is an element, then append it
           this.appendToCurrentTrace(stackHTML)
         }
       }
