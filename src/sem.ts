@@ -1121,11 +1121,11 @@ function pairHeight(pair: any) {
 function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID: number = Math.random()): any {
   //Container for html elements
   let div = document.createElement('div');
-  div.ariaLabel = 'object type vector';
+  div.ariaLabel = 'object type pair';
   div.tabIndex = 0;
   div.style.position = 'relative';
 
-  //loops through the vector, making the visualization pieces for each element
+  //loops through the pair, making the visualization pieces for each element
   for(let k = 0; k < 2; k++) {
     
     //container for all the html elements for one pair element
@@ -1135,14 +1135,14 @@ function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID:
     col.style.left = `${30 * k}px`
     //col.style.top = '20px'
 
-    //creates the elements for the box elements of the vector
+    //creates the elements for the box elements of the pair
     const box = document.createElement('div');
     box.className = 'vector-box';
     box.id = `${nesting}:${k}:${parent}:${imgID} val`
     //box.role = 'img'
     box.tabIndex = 0;
-    box.ariaDescription = `non-list pair ${k}, first element contains ${k === 0? pair.fst : pair.snd}`
-    box.ariaLabel = `non-list pair ${k}, first element contains ${k === 0? pair.fst : pair.snd}`
+    box.ariaDescription = `non-list pair ${k}, first element contains ${k === 0? Value.typeOf(pair.fst) : Value.typeOf(pair.snd)}`
+    box.ariaLabel = `non-list pair ${k}, first element contains ${k === 0? Value.typeOf(pair.fst) : Value.typeOf(pair.snd)}`
     col.appendChild(box);
     let snd = pair.snd
 
@@ -1161,7 +1161,7 @@ function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID:
       }
     }
 
-    //creates the arrow element for the vector
+    //creates the arrow element for the pair
     for(let j=0; j < height; j++) {
       const arrow = document.createElement('div');
       arrow.className = 'list-arrow-down'
@@ -1192,6 +1192,13 @@ function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID:
   }
 
   return div;
+}
+
+function drawStructHTML(struct: any) {
+  let str = "base"
+  struct.forEach((e: any, i: number) => {
+    str.concat(e.toString + " is index " + i + "   ")
+  })
 }
 
 export class Sem {
@@ -1486,7 +1493,7 @@ export class Sem {
 
           //for each bounded variable
           bounded?.forEach(e => {
-
+            console.log(e)
             //convert to string
             let strVal: any = e[1]?.toString()
 
@@ -1519,8 +1526,12 @@ export class Sem {
                 strVal = ("PROCEDURE")
                 ariaType = "procedure"
                 HTMLVal = "PROCEDURE"
+              } else if (e[1] != undefined && Value.isStruct(e[1])) {
+                HTMLVal = "STRUCT" //drawStructHTML(e[1])
+                ariaType = 'struct'
+                console.log("STRUCT")
               } else {
-                strVal
+                console.log("Found none for type " + Value.typeOf(e[1]))
               }
               
 
@@ -1559,6 +1570,7 @@ export class Sem {
 
       //if there is anything in the stack
       if(stack[0]) {
+        console.log(stack[0])
         //convert to string (probs not used)
         stackString = stack[stack.length - 1]?.toString()
 
