@@ -746,7 +746,7 @@ function drawVectorHTML(vector: any, nesting: number = 0, parent: number = 0, im
   //Container for html elements
   let div = document.createElement('div');
   div.ariaLabel = 'object type vector';
-  div.tabIndex = 0;
+  //div.tabIndex = 0;
   div.style.position = 'relative';
 
   //loops through the vector, making the visualization pieces for each element
@@ -754,7 +754,7 @@ function drawVectorHTML(vector: any, nesting: number = 0, parent: number = 0, im
     //container for all the html elements for one vector element
     const col = document.createElement('div');
     col.className = 'vector-style';
-    if (i > 0) col.style.position = 'absolute'
+    if (i > 0) col.style.position = 'absolute';
     col.style.left = `${30 * vector.indexOf(e)}px`
     //col.style.top = '20px'
 
@@ -809,7 +809,7 @@ function drawVectorHTML(vector: any, nesting: number = 0, parent: number = 0, im
       if(e.isList) {
         col.appendChild(drawListHTML(e, nesting + 1, i, imgID));
       } else {
-        col.appendChild(drawPair(e));
+        col.appendChild(drawPairHTML(e, nesting + 1, i, imgID));
       }
     } else if (Value.typeOf(e) === 'vector') {
       col.appendChild(drawVectorHTML(e, nesting + 1, i, imgID));
@@ -1051,7 +1051,7 @@ function drawListHTML(list: any, nesting: number = 0, parent: number = 0, imgID:
         if(el.isList) {
           col.appendChild(drawListHTML(el, nesting + 1, i, imgID));
         } else {
-          col.appendChild(drawPair(el));
+          col.appendChild(drawPairHTML(el, nesting + 1, i, imgID));
         }
       } else if (Value.typeOf(el) === 'vector') {
         col.appendChild(drawVectorHTML(el, nesting + 1, i, imgID));
@@ -1124,8 +1124,8 @@ function pairHeight(pair: any) {
 function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID: number = Math.random()): any {
   //Container for html elements
   let div = document.createElement('div');
-  div.ariaLabel = 'object type vector';
-  div.tabIndex = 0;
+  div.ariaLabel = 'object type pair';
+  //div.tabIndex = 0;
   div.style.position = 'relative';
 
   //loops through the vector, making the visualization pieces for each element
@@ -1134,7 +1134,7 @@ function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID:
     //container for all the html elements for one pair element
     const col = document.createElement('div');
     col.className = 'vector-style';
-    if (k > 0) col.style.position = 'absolute'
+    if (k > 0) col.style.position = 'absolute';
     col.style.left = `${30 * k}px`
     //col.style.top = '20px'
 
@@ -1144,8 +1144,16 @@ function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID:
     box.id = `${nesting}:${k}:${parent}:${imgID} val`
     //box.role = 'img'
     box.tabIndex = 0;
-    box.ariaDescription = `non-list pair ${k}, first element contains ${k === 0? pair.fst : pair.snd}`
-    box.ariaLabel = `non-list pair ${k}, first element contains ${k === 0? pair.fst : pair.snd}`
+    box.addEventListener('keydown', (e) => {
+      keyHandler(e.key, box, 'vector', imgID);
+    })
+    if(k > 0) {
+      box.ariaDescription = `non-list pair element 2, second element contains ${k === 0? pair.fst : pair.snd}`
+      box.ariaLabel = `non-list pair element 2, second element contains ${k === 0? pair.fst : pair.snd}`
+    } else {
+      box.ariaDescription = `non-list pair element 1, first element contains ${k === 0? pair.fst : pair.snd}`
+      box.ariaLabel = `non-list pair element 1, first element contains ${k === 0? pair.fst : pair.snd}`
+    }
     col.appendChild(box);
     let snd = pair.snd
 
@@ -1193,7 +1201,6 @@ function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID:
     }
      div.appendChild(col);
   }
-
   return div;
 }
 
