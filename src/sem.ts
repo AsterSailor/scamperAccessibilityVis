@@ -1346,7 +1346,9 @@ export class Sem {
 
   stepStruct (id: string, fields: string[]): void {
     this.tryPrintCurrentCodeSegment()
+    console.log("we're tracing the struct funtion")
     this.env = executeStructDecl(id, fields, this.env)
+    console.log(this.env)
     if (this.isTracing()) {
       this.appendToCurrentTrace(`Struct ${id} declared`)
       
@@ -1419,18 +1421,26 @@ export class Sem {
     let stmt = this.prog[this.curStmt]
     switch (stmt.kind) {
       case 'binding':
+        console.log("define")
+        console.log(this.env)
         this.stepDefine(stmt.name, stmt.body, stmt.range)
         break
       case 'exp':
+        console.log("exp")
+        console.log(this.env)
         this.stepExp(stmt.body)
         break
       case 'import':
+        console.log("imp")
         this.stepImport(stmt.modName, stmt.range)
         break
       case 'display':
+        console.log("dis")
         this.stepDisplay(stmt.body, stmt.range)
         break
       case 'struct':
+        console.log("struct")
+        console.log(this.env)
         this.stepStruct(stmt.id, stmt.fields)
         break
     }
@@ -1493,7 +1503,7 @@ export class Sem {
 
           //for each bounded variable
           bounded?.forEach(e => {
-            console.log(e)
+            //console.log(e)
             //convert to string
             let strVal: any = e[1]?.toString()
 
@@ -1552,7 +1562,7 @@ export class Sem {
                   })
               renderToDraw(this.display, div)
             }
-            console.log(this.jumpToList)
+            //console.log(this.jumpToList)
           })
 
           //environment end line
@@ -1570,7 +1580,7 @@ export class Sem {
 
       //if there is anything in the stack
       if(stack[0]) {
-        console.log(stack[0])
+        //console.log(stack[0])
         //convert to string (probs not used)
         stackString = stack[stack.length - 1]?.toString()
 

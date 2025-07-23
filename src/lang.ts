@@ -402,19 +402,102 @@ export class Env {
     return ret 
   }
 
+  findParentNum(bindings: any) {
+    let c = 0
+    while(bindings.parent) {
+      c += 1
+      bindings = bindings.parent
+    }
+    return c
+  }
   public toString2(libNum: number) {
-    const iterator1 = this.bindings[Symbol.iterator]();
-
     let bounds: [Id, Value.T][] = []
-    let count = -7
-    for (const item of iterator1) {
-      if(count > libNum) {
-        bounds.push(item)
+    let num = this.findParentNum(this.bindings)
+    let parent = this.parent
+    //const iterator1 = this.bindings[Symbol.iterator]();
+    
+    if(this.parent === undefined) {
+      const iterator1 = this.bindings[Symbol.iterator]();
+      let count = -7
+      for (const item of iterator1) {
+        if(count > libNum) {
+          bounds.push(item)
+        }
+        count += 1;
       }
-      count += 1;
+    } else {
+      let kernel = []
+      const iterator0 = this.bindings[Symbol.iterator]();
+      let count0 = 0
+      for (const item of iterator0) {
+        if(count0 > 3) {
+          kernel.push(item)
+        }
+        count0 += 1
+      }
+      kernel.reverse()
+      for(let i = 0; i < kernel.length; i++) {
+        bounds.push(kernel[i])
+      }
+      while(parent!.parent !== undefined) {
+        let kernel = []
+        const iterator2 = parent!.bindings[Symbol.iterator]();
+        let count = 0
+        for (const item of iterator2) {
+          if(count > 3) {
+            kernel.push(item)
+          }
+          count += 1
+        }
+        kernel.reverse()
+        for(let i = 0; i < kernel.length; i++) {
+          bounds.push(kernel[i])
+        }
+        num -= 1
+        parent = parent!.parent
+      }
+      const iterator3 = parent!.bindings[Symbol.iterator]();
+      kernel = []
+      let count = -7
+      for (const item of iterator3) {
+        if(count > libNum) {
+          kernel.push(item)
+        }
+        count += 1;
+      }
+      kernel.reverse()
+      for(let i = 0; i < kernel.length; i++) {
+        bounds.push(kernel[i])
+      }
     }
 
-    return bounds
+    // if(this.parent === undefined) {
+    //   let count = -7
+    //   for (const item of iterator1) {
+    //     if(count > libNum) {
+    //       bounds.push(item)
+    //     }
+    //     count += 1;
+    //   }
+    // } else {
+    //   const iterator2 = this.parent.bindings[Symbol.iterator]();
+    //   let count = -7
+    //   for (const item of iterator2) {
+    //     if(count > libNum) {
+    //       bounds.push(item)
+    //     }
+    //     count += 1;
+    //   }
+    //   count = 0
+    //   for (const item of iterator1) {
+    //     if(count > 3) {
+    //       bounds.push(item)
+    //     }
+    //     count += 1
+    //   }
+    // }
+
+    return bounds.reverse()
   }
 }
 
