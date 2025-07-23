@@ -23,7 +23,6 @@ const stepStmtButton = document.getElementById('step-stmt')! as HTMLButtonElemen
 const stepAllButton  = document.getElementById('step-all')! as HTMLButtonElement
 const astTextButton = document.getElementById('ast-text')! as HTMLButtonElement
 const drawButton = document.getElementById('vis-draw')! as HTMLButtonElement
-const drawBack = document.getElementById('vis-back')! as HTMLButtonElement
 
 
 class IDE {
@@ -45,16 +44,10 @@ class IDE {
         stepOnceButton.disabled = false
         stepStmtButton.disabled = false
         stepAllButton.disabled = false
-        if(!isDrawing) {
-          drawBack.disabled = true
-        } else {
-          drawBack.disabled = false
-        }
       } else {
         stepOnceButton.disabled = true
         stepStmtButton.disabled = true
         stepAllButton.disabled = true
-        drawBack.disabled = true
       }
       
     } catch (e) {
@@ -164,38 +157,36 @@ class IDE {
       //this.scamper!.stepProgram()
       outputPane.scrollTo(0, outputPane.scrollHeight)
     })
-    drawBack.addEventListener('click', () => {
-      //this.startScamper(true, true)
-      //this.scamper!.stepProgram()
-    })
     stepButton.addEventListener('click', () => this.startScamper(true, false))
+    window.addEventListener("keydown", (event) => {
+      if(event.key === '[' && event.ctrlKey) {
+        this.scamper!.stepProgram()
+        outputPane.scrollTo(0, outputPane.scrollHeight)
+      }
+    })
     stepOnceButton.addEventListener('click', () => {
       this.scamper!.stepProgram()
-      //@ts-ignore
-      if(!this.scamper.isDrawing) {
+      outputPane.scrollTo(0, outputPane.scrollHeight)
+    })
+    window.addEventListener("keydown", (event) => {
+      if(event.key === ']' && event.ctrlKey) {
+        this.scamper!.stepStmtProgram()
         outputPane.scrollTo(0, outputPane.scrollHeight)
-      } //else {
-      //   outputPane.scrollTo(0, outputPane.scrollHeight/2)
-      // }
+      }
     })
     stepStmtButton.addEventListener('click', () => {
       this.scamper!.stepStmtProgram()
-      //@ts-ignore
-      if(!this.scamper.isDrawing) {
+      outputPane.scrollTo(0, outputPane.scrollHeight)
+    })
+    window.addEventListener("keydown", (event) => {
+      if(event.key === "\\" && event.ctrlKey) {
+        this.scamper!.runProgram()
         outputPane.scrollTo(0, outputPane.scrollHeight)
-      } //else {
-        outputPane.scrollTo(0, outputPane.scrollHeight/2)
-        //display.findScroller(this.display)
-      //}
+      }
     })
     stepAllButton.addEventListener('click', () => {
       this.scamper!.runProgram()
-      //@ts-ignore
-      if(!this.scamper.isDrawing) {
-        outputPane.scrollTo(0, outputPane.scrollHeight)
-      } //else {
-      //   outputPane.scrollTo(0, outputPane.scrollHeight/2)
-      // }
+      outputPane.scrollTo(0, outputPane.scrollHeight)
     })
     astTextButton.addEventListener('click', () => {
       this.showASTText()
@@ -206,10 +197,10 @@ class IDE {
       window.open(`runner.html?${params.toString()}`)
     })
     
+    
     stepOnceButton.disabled = true
     stepStmtButton.disabled = true
     stepAllButton.disabled = true
-    drawBack.disabled = true
 
     Split(['#editor', '#results'], {
       sizes: [65, 35]

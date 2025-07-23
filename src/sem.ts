@@ -1,13 +1,11 @@
 import { ICE, Id, Library, Range, ScamperError, Stmt } from './lang.js'
 import { Env, Prog, Op, reservedWords, Value, } from './lang.js'
-import { renderToHTML, mkCodeElement, mkSourceBlock, renderToOutput , renderToDraw , addScroller , addFrame, addToFrame, findScroller } from './display.js'
+import { renderToHTML, mkCodeElement, mkSourceBlock, renderToOutput , renderToDraw } from './display.js'
 import * as C from './contract.js'
 //@ts-ignore
 import './styles.css'
-import { append, makeList } from './docs/api/prelude.js'
 
 let maxCallStackDepth = 100000;
-let stateHistory = [];
 
 ///// Machine state structures /////////////////////////////////////////////////
 
@@ -658,19 +656,15 @@ export function callFunction (fn: Value.Closure | Function, ...args: any): any {
   }
 }
 
-function makeTraceDiv(): HTMLElement {
+function makeTraceDiv(num: number): HTMLElement {
   const div = document.createElement('div')
   div.classList.add('scamper-trace')
   div.style.overflowX = 'auto'
   div.style.overflowY = 'hidden'
+  div.ariaLabel = "Step " + num
   return div
 }
 
-function makeDrawDiv(): HTMLElement {
-  const div = document.createElement('div')
-  div.classList.add('scamper-draw')
-  return div
-}
 
 function makeTraceHeader (s: Stmt.T): HTMLElement {
   switch (s.kind) {
@@ -712,17 +706,18 @@ function vectorHeight(vec: any, index: number = 0): number {
       height = height + 1
     } else if(Value.isPair(e)) {
       if(e.isList) {
-        height = height + listHeight(e) + 2
+        height = height + listHeight(e) + 1
       } else {
-        height = height + 1
+        height = height + pairHeight(e)
       }
     } else if(Value.typeOf(e) === 'vector') {
-      height = height + vectorHeight(e, 0) + 1
+      height = height + vectorHeight(e, 0) 
     }
   }
   return height + 3
 }
 
+//ASCII
 function drawVector(vector: any): any {
   let str = ''
   vector.forEach((e: any) => {
@@ -809,7 +804,11 @@ function drawVectorHTML(vector: any, nesting: number = 0, parent: number = 0, im
       if(e.isList) {
         col.appendChild(drawListHTML(e, nesting + 1, i, imgID));
       } else {
+<<<<<<< HEAD
         col.appendChild(drawPairHTML(e, nesting + 1, i, imgID));
+=======
+        col.appendChild(drawPairHTML(e));
+>>>>>>> ce96ebee797710236e82c7f288b9a2f14e38c1ce
       }
     } else if (Value.typeOf(e) === 'vector') {
       col.appendChild(drawVectorHTML(e, nesting + 1, i, imgID));
@@ -828,6 +827,7 @@ function lengthList(lst: any, count: number = 0) {
   }
 }
 
+//ASCII
 function drawList(list: any): any {
   if(list.isList) {
     let str = '{ '
@@ -861,15 +861,15 @@ function listHeight(list: any): number {
     const fst = list.fst
     if(list.snd === null) {
       if(typeof fst === 'string' || typeof fst === 'number' || typeof fst === 'boolean') {
-        height = height + 1 //1
+        height = height + 2 //1
       } else if(Value.isPair(fst)) {
         if(fst.isList) {
-          height = height + listHeight(fst) + 1
+          height = height + listHeight(fst) +  1
         } else {
-          height = height + 3 + 1
+          height = height + pairHeight(fst)
         }
       } else if(Value.typeOf(fst) === 'vector') {
-        height = height + vectorHeight(fst) + 1
+        height = height + vectorHeight(fst)
       }
     } else {
       //const next = list.snd.fst;
@@ -879,10 +879,10 @@ function listHeight(list: any): number {
         if(fst.isList) {
           height = height + listHeight(fst) + listHeight(list.snd) //1
         } else {
-          height = height + listHeight(list.snd) //1
+          height = height + pairHeight(fst) + listHeight(list.snd) //1
         }
       } else if(Value.typeOf(fst) === 'vector') {
-        height = height + vectorHeight(fst) + listHeight(list.snd)
+        height = height + vectorHeight(fst) - 1 + listHeight(list.snd)
       }
     }
   }
@@ -1051,7 +1051,11 @@ function drawListHTML(list: any, nesting: number = 0, parent: number = 0, imgID:
         if(el.isList) {
           col.appendChild(drawListHTML(el, nesting + 1, i, imgID));
         } else {
+<<<<<<< HEAD
           col.appendChild(drawPairHTML(el, nesting + 1, i, imgID));
+=======
+          col.appendChild(drawPairHTML(el));
+>>>>>>> ce96ebee797710236e82c7f288b9a2f14e38c1ce
         }
       } else if (Value.typeOf(el) === 'vector') {
         col.appendChild(drawVectorHTML(el, nesting + 1, i, imgID));
@@ -1065,6 +1069,7 @@ function drawListHTML(list: any, nesting: number = 0, parent: number = 0, imgID:
   return div;
 }
 
+//ASCII
 function drawPair(pair: any): any {
   let str = ''
   let fst = pair.fst
@@ -1115,7 +1120,7 @@ function pairHeight(pair: any) {
       height = height + pairHeight(fst)
     }
   } else if (Value.typeOf(fst) === 'vector') {
-    height = height + vectorHeight(fst)
+    height = height + vectorHeight(fst) - 1
   }
 
   return height
@@ -1125,10 +1130,14 @@ function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID:
   //Container for html elements
   let div = document.createElement('div');
   div.ariaLabel = 'object type pair';
+<<<<<<< HEAD
   //div.tabIndex = 0;
+=======
+  div.tabIndex = 0;
+>>>>>>> ce96ebee797710236e82c7f288b9a2f14e38c1ce
   div.style.position = 'relative';
 
-  //loops through the vector, making the visualization pieces for each element
+  //loops through the pair, making the visualization pieces for each element
   for(let k = 0; k < 2; k++) {
     
     //container for all the html elements for one pair element
@@ -1138,12 +1147,13 @@ function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID:
     col.style.left = `${30 * k}px`
     //col.style.top = '20px'
 
-    //creates the elements for the box elements of the vector
+    //creates the elements for the box elements of the pair
     const box = document.createElement('div');
     box.className = 'vector-box';
     box.id = `${nesting}:${k}:${parent}:${imgID} val`
     //box.role = 'img'
     box.tabIndex = 0;
+<<<<<<< HEAD
     box.addEventListener('keydown', (e) => {
       keyHandler(e.key, box, 'vector', imgID);
     })
@@ -1154,6 +1164,10 @@ function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID:
       box.ariaDescription = `non-list pair element 1, first element contains ${k === 0? pair.fst : pair.snd}`
       box.ariaLabel = `non-list pair element 1, first element contains ${k === 0? pair.fst : pair.snd}`
     }
+=======
+    box.ariaDescription = `non-list pair ${k}, first element contains ${k === 0? Value.typeOf(pair.fst) : Value.typeOf(pair.snd)}`
+    box.ariaLabel = `non-list pair ${k}, first element contains ${k === 0? Value.typeOf(pair.fst) : Value.typeOf(pair.snd)}`
+>>>>>>> ce96ebee797710236e82c7f288b9a2f14e38c1ce
     col.appendChild(box);
     let snd = pair.snd
 
@@ -1172,7 +1186,7 @@ function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID:
       }
     }
 
-    //creates the arrow element for the vector
+    //creates the arrow element for the pair
     for(let j=0; j < height; j++) {
       const arrow = document.createElement('div');
       arrow.className = 'list-arrow-down'
@@ -1204,6 +1218,13 @@ function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID:
   return div;
 }
 
+function drawStructHTML(struct: any) {
+  let str = "base"
+  struct.forEach((e: any, i: number) => {
+    str.concat(e.toString + " is index " + i + "   ")
+  })
+}
+
 export class Sem {
   display: HTMLElement
   env: Env
@@ -1218,6 +1239,7 @@ export class Sem {
   defaultDisplay: boolean
   isPrintingCode: boolean
   isDrawing: boolean
+  jumpToList?: HTMLElement[]
 
   constructor (display: HTMLElement,
                builtinLibs: Map<Id, Library>,
@@ -1234,10 +1256,10 @@ export class Sem {
     if (isTracing) {
       this.traces = new Array(prog.length)
       for (let i = 0; i < prog.length; i++) {
-        this.traces[i] = makeTraceDiv()
+        this.traces[i] = makeTraceDiv(i)
       }
       if(isDrawing) {
-        //addScroller(this.display, this.traces[prog.length - 1])
+        this.jumpToList = []
       }
     } else {
       this.traces = undefined
@@ -1267,24 +1289,10 @@ export class Sem {
     this.curStmt += 1
     this.state = undefined
     if (!this.isFinished() && this.isTracing()) {
-      //if(this.isDrawing) {
-        //this.display.insertBefore(this.traces![this.curStmt]!, findScroller(this.display))
-        //let scrollVar = findScroller(this.display)
-        //scrollVar!.scrollLeft = scrollVar!.scrollWidth
-
-      //} else {
       this.display.appendChild(this.traces![this.curStmt]!)
-      //}
       this.appendToCurrentTrace(makeTraceHeader(this.prog[this.curStmt]))
       this.appendToCurrentTrace('\n')
     }
-    // console.log(this.traces)
-    // console.log(this.curStmt)
-  }
-
-  goBack() {
-    //this.curStmt -= 1
-    //this.traces = this.traces?.slice(0, this.traces.length - 1)
   }
 
   tryPrintCurrentCodeSegment(): void {
@@ -1311,8 +1319,6 @@ export class Sem {
           this.appendToCurrentTrace(' ')
           this.appendToCurrentTrace(renderToHTML(stateToExp(this.state)!))
           this.appendToCurrentTrace('\n')
-          //addToFrame(findScroller(this.display), "HYYYY")
-          
         }
       } catch (e) {
         renderToOutput(this.display, e, )
@@ -1364,7 +1370,9 @@ export class Sem {
 
   stepStruct (id: string, fields: string[]): void {
     this.tryPrintCurrentCodeSegment()
+    console.log("we're tracing the struct funtion")
     this.env = executeStructDecl(id, fields, this.env)
+    console.log(this.env)
     if (this.isTracing()) {
       this.appendToCurrentTrace(`Struct ${id} declared`)
       
@@ -1437,18 +1445,26 @@ export class Sem {
     let stmt = this.prog[this.curStmt]
     switch (stmt.kind) {
       case 'binding':
+        console.log("define")
+        console.log(this.env)
         this.stepDefine(stmt.name, stmt.body, stmt.range)
         break
       case 'exp':
+        console.log("exp")
+        console.log(this.env)
         this.stepExp(stmt.body)
         break
       case 'import':
+        console.log("imp")
         this.stepImport(stmt.modName, stmt.range)
         break
       case 'display':
+        console.log("dis")
         this.stepDisplay(stmt.body, stmt.range)
         break
       case 'struct':
+        console.log("struct")
+        console.log(this.env)
         this.stepStruct(stmt.id, stmt.fields)
         break
     }
@@ -1480,53 +1496,119 @@ export class Sem {
     })
 
     if(envState != undefined){
+
+      //grabs bounded values from the environment
       let bounded = envState.getBoundsEnv(initialLibNum)
+
+      //grabs the stack
       let stack = envState.getStack()
+
+      //if the stack is empty
       if(!stack[0]) {
+
+        //and bounded variables exist
         if(bounded != undefined && bounded.length > 0) {
-          //@ts-ignore
-          //let frame = addFrame(this.display.children.namedItem('scrolls'))
-          renderToDraw(this.display, "------------------------------~")
+          
+          //environment begin line
+          let div1 = document.createElement('div')
+          div1.ariaLabel = "Begin environment"
+          div1.ariaDescription = "Begin environment"
+          div1.textContent = "------------------------------~"
+          div1.tabIndex = 0
+          div1.addEventListener('keydown', (event) => {
+            if(event.key === 'j' && event.ctrlKey) {
+              if(this.jumpToList![this.jumpToList!.indexOf(div1) + 1]) {
+                this.jumpToList![this.jumpToList!.indexOf(div1) + 1].focus()
+             }
+            }
+          })
+          renderToDraw(this.display, div1)
+          this.jumpToList?.push(div1)
 
+          //for each bounded variable
           bounded?.forEach(e => {
+            //console.log(e)
+            //convert to string
             let strVal: any = e[1]?.toString()
-            let HTMLVal: any = ''
 
+            let HTMLVal: any = ''
+            let ariaType = ""
+
+            //typecheck the variable(s) and convert to string or HTML elements
             if(strVal != undefined) {
-              if(typeof e[1] === 'string' && typeof e[0] === 'number' && typeof stack[0] != 'boolean') {
+              if(typeof e[1] === 'string' || typeof e[1] === 'number' || typeof stack[1] === 'boolean') {
                 strVal = strVal
-                HTMLVal = e[1] + ''
+                if(typeof e[1] === 'string'){
+                  HTMLVal = "\"" + e[1] + "\""
+                } else {
+                  HTMLVal = e[1] + ''
+                }
+                ariaType = typeof e[1]
               } else if (e[1] != undefined && Value.typeOf(e[1]) === 'vector') {
                 strVal = drawVector(e[1]) + ' Vetcor Height ' + (vectorHeight(e[1]) + 1)
                 HTMLVal = drawVectorHTML(e[1])
+                ariaType = "vector"
               } else if (e[1] != undefined && Value.typeOf(e[1]) === 'list') {
                 strVal = drawList(e[1]) + ' List Height == ' + (listHeight(e[1]) + 1)
                 HTMLVal = drawListHTML(e[1])
+                ariaType = "list"
               } else if (e[1] != undefined && Value.isPair(e[1])) {
                 strVal = drawPair(e[1])
                 HTMLVal = drawPairHTML(e[1])
+                ariaType = "pair"
               } else if (e[1] != undefined && Value.isFunction(e[1])) {
                 strVal = ("PROCEDURE")
+                ariaType = "procedure"
+                HTMLVal = "PROCEDURE"
+              } else if (e[1] != undefined && Value.isStruct(e[1])) {
+                HTMLVal = "STRUCT" //drawStructHTML(e[1])
+                ariaType = 'struct'
+                console.log("STRUCT")
               } else {
-                strVal
+                console.log("Found none for type " + Value.typeOf(e[1]))
               }
               
-              //renderToDraw(this.display, e[0] + "  --->  " + strVal)
-              //addToFrame(frame, HTMLVal)
-              renderToDraw(this.display, HTMLVal)
+
+              //draw
+              let div = document.createElement('div')
+              div.textContent = e[0] + ' → '
+              div.style.display = 'flex'
+              div.ariaLabel = e[0] + " points to " + ariaType
+              div.ariaDescription = e[0] + " points to " + ariaType
+              div.append(HTMLVal)
+              this.jumpToList!.push(HTMLVal)
+              div.addEventListener('keydown', (event) => {
+                    if(event.key === 'j' && event.ctrlKey) {
+                      if(this.jumpToList![this.jumpToList!.indexOf(HTMLVal) + 1]) {
+                        this.jumpToList![this.jumpToList!.indexOf(HTMLVal) + 1].focus()
+                     }
+                    }
+                  })
+              renderToDraw(this.display, div)
             }
-            //this.draws![this.draws!.length - 1] = frame
+            //console.log(this.jumpToList)
           })
-          renderToDraw(this.display, "------------------------------^")
+
+          //environment end line
+          let div2 = document.createElement('div')
+          div2.ariaLabel = "End environment"
+          div2.ariaDescription = "End environment"
+          div2.textContent = "------------------------------~"
+          div2.tabIndex = 0
+          renderToDraw(this.display, div2)
         }
       }
 
       let stackString;
       let stackHTML;
 
+      //if there is anything in the stack
       if(stack[0]) {
-        //let frame = addFrame(this.display.children.namedItem('scrolls'))
+        //console.log(stack[0])
+        //convert to string (probs not used)
         stackString = stack[stack.length - 1]?.toString()
+
+        //type check and convert to string or HTML element
         if(typeof stack[0] != 'string' && typeof stack[0] != 'number' && typeof stack[0] != 'boolean') {
           if(stack[0] != undefined && Value.typeOf(stack[0]) === 'vector') {
             stackString = drawVector(stack[0])
@@ -1553,26 +1635,22 @@ export class Sem {
                   stackString = drawPair(Value.mkPair(last.fst, last.snd))
                   stackHTML = drawPairHTML(Value.mkPair(last.fst, last.snd))
                 }
+
+                //attempt at drawing map (ignore)
                 //@ts-ignore
               } else if(stack[0].name === 'map') {
                 //forEachstack.push(Value.mkList)
                 console.log("mapping")
               }
-            } else {
+            } else {//catch
               stackString = ("PROCEDURE")
+              
             }
           }
         }
-        //renderToDraw(this.display,  ">>> " + stackString)
-        //renderToDraw(this.display, stackHTML)
-        
-        
-        // const div = document.createElement('div')
-        // div.classList.add('frame')
-        // div.append(stackHTML)
-        // this.appendToCurrentTrace(div)
-        //or
-        this.appendToCurrentTrace(stackHTML)
+        if(stackHTML){//if there is an element, then append it
+          this.appendToCurrentTrace(stackHTML)
+        }
       }
     }
     
