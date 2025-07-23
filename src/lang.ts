@@ -430,7 +430,7 @@ export class Env {
       const iterator0 = this.bindings[Symbol.iterator]();
       let count0 = 0
       for (const item of iterator0) {
-        if(count0 > 3) {
+        if(count0 > 3) { //if you (yes, you) ever want to skip the middle two elements, just do count !== 1 && count !== 2
           kernel.push(item)
         }
         count0 += 1
@@ -444,7 +444,7 @@ export class Env {
         const iterator2 = parent!.bindings[Symbol.iterator]();
         let count = 0
         for (const item of iterator2) {
-          if(count > 3) {
+          if(count > 3) { //change this too (yes, you)
             kernel.push(item)
           }
           count += 1
@@ -469,35 +469,10 @@ export class Env {
       for(let i = 0; i < kernel.length; i++) {
         bounds.push(kernel[i])
       }
+
+      return bounds.reverse()
     }
-
-    // if(this.parent === undefined) {
-    //   let count = -7
-    //   for (const item of iterator1) {
-    //     if(count > libNum) {
-    //       bounds.push(item)
-    //     }
-    //     count += 1;
-    //   }
-    // } else {
-    //   const iterator2 = this.parent.bindings[Symbol.iterator]();
-    //   let count = -7
-    //   for (const item of iterator2) {
-    //     if(count > libNum) {
-    //       bounds.push(item)
-    //     }
-    //     count += 1;
-    //   }
-    //   count = 0
-    //   for (const item of iterator1) {
-    //     if(count > 3) {
-    //       bounds.push(item)
-    //     }
-    //     count += 1
-    //   }
-    // }
-
-    return bounds.reverse()
+    return bounds
   }
 }
 
