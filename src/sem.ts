@@ -749,15 +749,11 @@ function drawVectorHTML(vector: any, nesting: number = 0, parent: number = 0, im
     //container for all the html elements for one vector element
     const col = document.createElement('div');
     col.className = 'vector-style';
-    if (i > 0) col.style.position = 'absolute'
+    if (i > 0) col.style.position = 'absolute';
     col.style.left = `${30 * vector.indexOf(e)}px`
     //col.style.top = '20px'
 
-    //creates the elements for the box elements of the vector
-
-    //adds a listener that checks for certain arrow keys, on those presses moves to appropriate element
-    //stores all elements in that layer in an array for potential access, then focuses using
-    //the focus() function
+    //creates the box elements of the vector
     const box = document.createElement('div');
     const index = document.createElement('div');
     const indexVal = vector.indexOf(e).toString();
@@ -765,7 +761,6 @@ function drawVectorHTML(vector: any, nesting: number = 0, parent: number = 0, im
     index.textContent = indexVal;
     col.appendChild(index);
     box.className = 'vector-box';
-    //box.role = 'img'
     box.tabIndex = 0;
     box.id = `${nesting}:${i}:${parent}:${imgID} val`
     box.addEventListener('keydown', (e) => {
@@ -789,14 +784,14 @@ function drawVectorHTML(vector: any, nesting: number = 0, parent: number = 0, im
       arrow.className = 'vec-arrow'
       col.appendChild(arrow);
     }
-
     const val = document.createElement('div');
     val.className = 'down-arrow-box';
     val.textContent = '  ▽';
     col.appendChild(val);
+
+    //creates the box containing the value in the element
     let val2 = document.createElement('div');
     val2.className = 'val-box';
-    //creates the box containing the value in the element
     if(typeof e === 'string' || typeof e === 'number' || typeof e === 'boolean') {
       val2.textContent = e + '';
       col.appendChild(val2);
@@ -804,12 +799,13 @@ function drawVectorHTML(vector: any, nesting: number = 0, parent: number = 0, im
       if(e.isList) {
         col.appendChild(drawListHTML(e, nesting + 1, i, imgID));
       } else {
-        col.appendChild(drawPairHTML(e));
+        col.appendChild(drawPairHTML(e, nesting + 1, i, imgID));
       }
     } else if (Value.typeOf(e) === 'vector') {
       col.appendChild(drawVectorHTML(e, nesting + 1, i, imgID));
     }
-     div.appendChild(col);
+
+    div.appendChild(col);
   })
   return div
 }
@@ -860,7 +856,7 @@ function listHeight(list: any): number {
         height = height + 2 //1
       } else if(Value.isPair(fst)) {
         if(fst.isList) {
-          height = height + listHeight(fst) +  1
+          height = height + listHeight(fst) + 1
         } else {
           height = height + pairHeight(fst)
         }
@@ -868,7 +864,6 @@ function listHeight(list: any): number {
         height = height + vectorHeight(fst)
       }
     } else {
-      //const next = list.snd.fst;
       if(typeof fst === 'string' || typeof fst === 'number' || typeof fst === 'boolean') {
         height = height + listHeight(list.snd) + 1
       } else if(Value.isPair(fst)) {
@@ -887,6 +882,7 @@ function listHeight(list: any): number {
 
 function keyHandler(key: any, box: HTMLElement, mode: string, imgID: number) {
   let loc = box.id
+  //handles checks when key is pressed in a vector
   if(mode === 'vector') {
     if(key === 'ArrowDown') {
       loc = `${Number(loc[0] ) + 1}:0:${loc[2]}:${imgID} val`
@@ -904,6 +900,7 @@ function keyHandler(key: any, box: HTMLElement, mode: string, imgID: number) {
         document.getElementById(loc)?.focus()
       }
     }
+    //handles checks in a list when in the first element of a list pair
   } else if(loc.includes('val')) {
     if(key === 'ArrowDown') {
       loc = `${Number(loc[0]) + 1}:0:${loc[2]}:${imgID} val`
@@ -924,13 +921,7 @@ function keyHandler(key: any, box: HTMLElement, mode: string, imgID: number) {
         document.getElementById(loc)?.focus()
       }
     } 
-    // else if(e.key === 'ArrowUp') {
-    //   if(document.getElementById())
-    //   loc = `${Number(loc[0]) - 1}:${loc[4]}:${} val`
-    //   if(document.getElementById(loc)) {
-    //     document.getElementById(loc)?.focus()
-    //   }
-    // }
+    //handles checks in a list if in the second element of a list pair
   } else if(loc.includes('next')) {
     if(key === 'ArrowDown') {
       loc = `${Number(loc[0] + 1)}:0:${loc[2]}:${imgID} val`
@@ -951,7 +942,7 @@ function keyHandler(key: any, box: HTMLElement, mode: string, imgID: number) {
   }
 }
 
-//should be called with no nesting initially
+//if variable is given a default value, should always be called with default value outside of the function
 function drawListHTML(list: any, nesting: number = 0, parent: number = 0, imgID: number = Math.random()): any {
   //declares overall html object to be appended to page
   const div = document.createElement('div');
@@ -1031,7 +1022,8 @@ function drawListHTML(list: any, nesting: number = 0, parent: number = 0, imgID:
         arrow.className = 'list-arrow-down'
         col.appendChild(arrow);
       }
-        
+      
+      //creates the container for the value contained in the first element of a list pair
       let el = list.fst
       const val = document.createElement('div');
       val.className = 'val-box';
@@ -1039,7 +1031,6 @@ function drawListHTML(list: any, nesting: number = 0, parent: number = 0, imgID:
       col.appendChild(val);
       const val2 = document.createElement('div');
       val2.className = 'val-box';
-      //creates the box containing the value in the element
       if(typeof el === 'string' || typeof el === 'number' || typeof el === 'boolean') {
         val2.textContent = el + ''
         col.appendChild(val2);
@@ -1047,7 +1038,7 @@ function drawListHTML(list: any, nesting: number = 0, parent: number = 0, imgID:
         if(el.isList) {
           col.appendChild(drawListHTML(el, nesting + 1, i, imgID));
         } else {
-          col.appendChild(drawPairHTML(el));
+          col.appendChild(drawPairHTML(el, nesting + 1, i, imgID));
         }
       } else if (Value.typeOf(el) === 'vector') {
         col.appendChild(drawVectorHTML(el, nesting + 1, i, imgID));
@@ -1122,7 +1113,7 @@ function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID:
   //Container for html elements
   let div = document.createElement('div');
   div.ariaLabel = 'object type pair';
-  div.tabIndex = 0;
+  //div.tabIndex = 0;
   div.style.position = 'relative';
 
   //loops through the pair, making the visualization pieces for each element
@@ -1131,7 +1122,7 @@ function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID:
     //container for all the html elements for one pair element
     const col = document.createElement('div');
     col.className = 'vector-style';
-    if (k > 0) col.style.position = 'absolute'
+    if (k > 0) col.style.position = 'absolute';
     col.style.left = `${30 * k}px`
     //col.style.top = '20px'
 
@@ -1141,8 +1132,16 @@ function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID:
     box.id = `${nesting}:${k}:${parent}:${imgID} val`
     //box.role = 'img'
     box.tabIndex = 0;
-    box.ariaDescription = `non-list pair ${k}, first element contains ${k === 0? Value.typeOf(pair.fst) : Value.typeOf(pair.snd)}`
-    box.ariaLabel = `non-list pair ${k}, first element contains ${k === 0? Value.typeOf(pair.fst) : Value.typeOf(pair.snd)}`
+    box.addEventListener('keydown', (e) => {
+      keyHandler(e.key, box, 'vector', imgID);
+    })
+    if(k > 0) {
+      box.ariaDescription = `non-list pair element 2, second element contains ${k === 0? pair.fst : pair.snd}`
+      box.ariaLabel = `non-list pair element 2, second element contains ${k === 0? pair.fst : pair.snd}`
+    } else {
+      box.ariaDescription = `non-list pair element 1, first element contains ${k === 0? pair.fst : pair.snd}`
+      box.ariaLabel = `non-list pair element 1, first element contains ${k === 0? pair.fst : pair.snd}`
+    }
     col.appendChild(box);
     let snd = pair.snd
 
@@ -1190,7 +1189,6 @@ function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID:
     }
      div.appendChild(col);
   }
-
   return div;
 }
 
@@ -1379,9 +1377,7 @@ export class Sem {
 
   stepStruct (id: string, fields: string[]): void {
     this.tryPrintCurrentCodeSegment()
-    console.log("we're tracing the struct funtion")
     this.env = executeStructDecl(id, fields, this.env)
-    console.log(this.env)
     if (this.isTracing()) {
       this.appendToCurrentTrace(`Struct ${id} declared`)
       
@@ -1454,26 +1450,18 @@ export class Sem {
     let stmt = this.prog[this.curStmt]
     switch (stmt.kind) {
       case 'binding':
-        console.log("define")
-        console.log(this.env)
         this.stepDefine(stmt.name, stmt.body, stmt.range)
         break
       case 'exp':
-        console.log("exp")
-        console.log(this.env)
         this.stepExp(stmt.body)
         break
       case 'import':
-        console.log("imp")
         this.stepImport(stmt.modName, stmt.range)
         break
       case 'display':
-        console.log("dis")
         this.stepDisplay(stmt.body, stmt.range)
         break
       case 'struct':
-        console.log("struct")
-        console.log(this.env)
         this.stepStruct(stmt.id, stmt.fields)
         break
     }
@@ -1536,8 +1524,6 @@ export class Sem {
 
           //for each bounded variable
           bounded?.forEach(e => {
-            //console.log(e)
-            //convert to string
             let strVal: any = e[1]?.toString()
 
             let HTMLVal: any = ''
