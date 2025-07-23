@@ -1195,10 +1195,43 @@ function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID:
 }
 
 function drawStructHTML(struct: any) {
-  let str = "base"
-  struct.forEach((e: any, i: number) => {
-    str.concat(e.toString + " is index " + i + "   ")
-  })
+  let str = []
+  for (const thing in struct) {
+    str.push(thing)
+  }
+  let val = []
+  for (const thing in struct) {
+    val.push(' ' + struct[thing])
+  }
+
+  let div = document.createElement('div');
+  div.ariaLabel = 'object type pair';
+  div.tabIndex = 0;
+  //div.style.position = 'relative';
+
+  const col = document.createElement('div');
+    col.className = 'vector-style';
+    //col.style.position = 'absolute'
+    col.style.left = `${30}px`
+
+    
+  const box = document.createElement('div');
+    box.id = "struct kind " + struct.kind
+    box.className = 'struct-box';
+    //box.role = 'img'
+    box.tabIndex = 0;
+    box.ariaDescription = `no`
+    box.ariaLabel = `no`
+    let s = ''
+    for (const thing in struct) {
+      s = s + thing + "     \n\n"
+    }
+    box.innerHTML = s
+    col.appendChild(box);
+    
+    div.appendChild(col);
+
+  return div
 }
 
 export class Sem {
@@ -1535,11 +1568,12 @@ export class Sem {
               } else if (e[1] != undefined && Value.isFunction(e[1])) {
                 strVal = ("PROCEDURE")
                 ariaType = "procedure"
-                HTMLVal = "PROCEDURE"
+                HTMLVal = e[1].toString()//"PROCEDURE"
               } else if (e[1] != undefined && Value.isStruct(e[1])) {
-                HTMLVal = "STRUCT" //drawStructHTML(e[1])
+                HTMLVal = drawStructHTML(e[1])
                 ariaType = 'struct'
                 console.log("STRUCT")
+                console.log(e[1])
               } else {
                 console.log("Found none for type " + Value.typeOf(e[1]))
               }

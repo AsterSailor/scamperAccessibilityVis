@@ -402,17 +402,10 @@ export class Env {
     return ret 
   }
 
-  findParentNum(bindings: any) {
-    let c = 0
-    while(bindings.parent) {
-      c += 1
-      bindings = bindings.parent
-    }
-    return c
-  }
+
   public toString2(libNum: number) {
     let bounds: [Id, Value.T][] = []
-    let num = this.findParentNum(this.bindings)
+
     let parent = this.parent
     //const iterator1 = this.bindings[Symbol.iterator]();
     
@@ -453,7 +446,6 @@ export class Env {
         for(let i = 0; i < kernel.length; i++) {
           bounds.push(kernel[i])
         }
-        num -= 1
         parent = parent!.parent
       }
       const iterator3 = parent!.bindings[Symbol.iterator]();
