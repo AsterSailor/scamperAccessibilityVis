@@ -773,8 +773,8 @@ function drawVectorHTML(vector: any, nesting: number = 0, parent: number = 0, im
       box.ariaDescription = `vector index ${indexVal} contains a vector`
       box.ariaLabel = `vector index ${indexVal} contains a vector`
     } else {
-      box.ariaDescription = `vector index ${indexVal} contains ${'' + e}`
-      box.ariaLabel = `vector index ${indexVal} contains ${'' + e}`
+      box.ariaDescription = `vector index ${indexVal} contains ${e.toString()}`
+      box.ariaLabel = `vector index ${indexVal} contains ${e.toString()}`
     }
     col.appendChild(box);
 
@@ -793,7 +793,7 @@ function drawVectorHTML(vector: any, nesting: number = 0, parent: number = 0, im
     let val2 = document.createElement('div');
     val2.className = 'val-box';
     if(typeof e === 'string' || typeof e === 'number' || typeof e === 'boolean') {
-      val2.textContent = e + '';
+      val2.textContent = e.toString();
       col.appendChild(val2);
     } else if (Value.isPair(e)) {
       if(e.isList) {
@@ -1032,7 +1032,7 @@ function drawListHTML(list: any, nesting: number = 0, parent: number = 0, imgID:
       const val2 = document.createElement('div');
       val2.className = 'val-box';
       if(typeof el === 'string' || typeof el === 'number' || typeof el === 'boolean') {
-        val2.textContent = el + ''
+        val2.textContent = el.toString()
         col.appendChild(val2);
       } else if (Value.isPair(el)) {
         if(el.isList) {
@@ -1176,7 +1176,7 @@ function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID:
     val2.className = 'val-box';
     //creates the box containing the value in the element
     if(typeof e === 'string' || typeof e === 'number' || typeof e === 'boolean') {
-      val2.textContent = e + '';
+      val2.textContent = e.toString();
       col.appendChild(val2);
     } else if (Value.isPair(e)) {
       if(e.isList) {
@@ -1193,41 +1193,87 @@ function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID:
 }
 
 function drawStructHTML(struct: any) {
-  let str = []
-  for (const thing in struct) {
-    str.push(thing)
-  }
-  let val = []
-  for (const thing in struct) {
-    val.push(' ' + struct[thing])
-  }
-
   let div = document.createElement('div');
-  div.ariaLabel = 'object type pair';
   div.tabIndex = 0;
+  div.style.flex = 'true'
+  //div.style.position = 'relative';
   //div.style.position = 'relative';
 
   const col = document.createElement('div');
     col.className = 'vector-style';
     //col.style.position = 'absolute'
     col.style.left = `${30}px`
+  const col2 = document.createElement('div');
+    col2.style.margin = "-3"
+    //col.style.position = 'absolute'
+    col2.style.left = `${30}px`
+  const col3 = document.createElement('div');
+    col3.className = 'vector-style';
+    //col.style.position = 'absolute'
+    col3.style.left = `${30}px`
+    
+  
+    
+  for (const thing in struct) {
+    let t = struct[thing]
+    let h = 0
+    let s = thing.toString() + "      "
+    let i = 0
+
+    if(typeof t === 'string' || typeof t === 'number' || typeof t === 'boolean' ) {
+      h = 1
+    } else if (Value.isPair(t)) {
+      if(t.isList) {
+        h = listHeight(t) * 1.5
+      } else {
+        h = pairHeight(t) * 1.5
+      }
+    } else if (Value.typeOf(t) === 'vector') {
+      h = vectorHeight(t) * 1.5
+    } else if (Value.isNull(t)) {
+      h = 1
+    }
+
+    // for(let i = 0; i <= h; i++) {
+    //   s += "\n"
+    // }
+    // string = string + s
+    // height += h
+    const box = document.createElement('div');
+      box.id = "struct kind " + struct.kind
+      box.className = 'struct-box';
+      // let height = 0
+      // let string = ''
+      box.tabIndex = 0;
+      box.ariaDescription = `no`
+      box.ariaLabel = `no`
+      box.style.height = h.toString()
+      box.innerHTML = s
+      console.log("STRUCT LENGTHHHH", struct.length)
+      if(i !== 0) {
+        box.style.borderTopWidth = '0'
+      } else if (i !== struct.length - 1) {
+        box.style.borderBottomWidth = '0'
+      }
+      col.appendChild(box);
+
+    const nextArrow = document.createElement('div');
+      nextArrow.className = 'list-arrow';
+    const arrowHead = document.createElement('div');
+      arrowHead.className = 'arrow-box'
+      arrowHead.textContent = '▶'
+    const miniDiv = document.createElement('div');
+      //miniDiv.style.flex = "true"
+      miniDiv.className = 'list-style'
+      miniDiv.appendChild(nextArrow)
+      miniDiv.appendChild(arrowHead)
+      col2.appendChild(miniDiv);
+  }
 
     
-  const box = document.createElement('div');
-    box.id = "struct kind " + struct.kind
-    box.className = 'struct-box';
-    //box.role = 'img'
-    box.tabIndex = 0;
-    box.ariaDescription = `no`
-    box.ariaLabel = `no`
-    let s = ''
-    for (const thing in struct) {
-      s = s + thing + "     \n\n"
-    }
-    box.innerHTML = s
-    col.appendChild(box);
-    
-    div.appendChild(col);
+  
+  div.appendChild(col);
+  div.appendChild(col2)
 
   return div
 }
@@ -1531,12 +1577,12 @@ export class Sem {
 
             //typecheck the variable(s) and convert to string or HTML elements
             if(strVal != undefined) {
-              if(typeof e[1] === 'string' || typeof e[1] === 'number' || typeof stack[1] === 'boolean') {
+              if(typeof e[1] === 'string' || typeof e[1] === 'number' || typeof e[1] === 'boolean') {
                 strVal = strVal
                 if(typeof e[1] === 'string'){
                   HTMLVal = "\"" + e[1] + "\""
                 } else {
-                  HTMLVal = e[1] + ''
+                  HTMLVal = e[1]?.toString()
                 }
                 ariaType = typeof e[1]
               } else if (e[1] != undefined && Value.typeOf(e[1]) === 'vector') {
