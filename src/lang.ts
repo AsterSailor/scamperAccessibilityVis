@@ -153,7 +153,7 @@ export namespace Value {
   export const isPair = (v: T): boolean => isTaggedObject(v) && (v as TaggedObject)[scamperTag] === 'pair'
   export const isList = (v: T): boolean => v === null || (isPair(v) && (v as Pair).isList)
   export const isSyntax = (v: T): boolean => isTaggedObject(v) && (v as TaggedObject)[scamperTag] === 'syntax'
-  export const isStruct = (v: T): boolean => isTaggedObject(v) && (v as TaggedObject)[scamperTag] === 'struct'
+  export const isStruct = (v: T): v is Struct => isTaggedObject(v) && (v as TaggedObject)[scamperTag] === 'struct'
   export const isStructKind = (v: T, k: string): boolean => isStruct(v) && (v as Struct)[structKind] === k
 
   export const mkClosure = (arity: number, params: Id[], ops: Op.T[], env: Env): T =>

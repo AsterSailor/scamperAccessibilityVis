@@ -1192,7 +1192,7 @@ function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID:
   return div;
 }
 
-function drawStructHTML(struct: any) {
+function drawStructHTML(struct: Value.Struct) {
   let div = document.createElement('div');
   div.tabIndex = 0;
   div.style.flex = 'true'
@@ -1211,8 +1211,8 @@ function drawStructHTML(struct: any) {
     col3.className = 'vector-style';
     //col.style.position = 'absolute'
     col3.style.left = `${30}px`
-    
-  
+
+
     
   for (const thing in struct) {
     let t = struct[thing]
@@ -1271,7 +1271,7 @@ function drawStructHTML(struct: any) {
   }
 
     
-  
+
   div.appendChild(col);
   div.appendChild(col2)
 
@@ -1569,65 +1569,65 @@ export class Sem {
           this.jumpToList?.push(div1)
 
           //for each bounded variable
-          bounded?.forEach(e => {
-            let strVal: any = e[1]?.toString()
+          bounded?.forEach(([id, value]) => {
+            let strVal: any = value?.toString()
 
             let HTMLVal: any = ''
             let ariaType = ""
 
             //typecheck the variable(s) and convert to string or HTML elements
-            if(strVal != undefined) {
-              if(typeof e[1] === 'string' || typeof e[1] === 'number' || typeof e[1] === 'boolean') {
-                strVal = strVal
-                if(typeof e[1] === 'string'){
-                  HTMLVal = "\"" + e[1] + "\""
-                } else {
-                  HTMLVal = e[1]?.toString()
-                }
-                ariaType = typeof e[1]
-              } else if (e[1] != undefined && Value.typeOf(e[1]) === 'vector') {
-                strVal = drawVector(e[1]) + ' Vetcor Height ' + (vectorHeight(e[1]) + 1)
-                HTMLVal = drawVectorHTML(e[1])
-                ariaType = "vector"
-              } else if (e[1] != undefined && Value.typeOf(e[1]) === 'list') {
-                strVal = drawList(e[1]) + ' List Height == ' + (listHeight(e[1]) + 1)
-                HTMLVal = drawListHTML(e[1])
-                ariaType = "list"
-              } else if (e[1] != undefined && Value.isPair(e[1])) {
-                strVal = drawPair(e[1])
-                HTMLVal = drawPairHTML(e[1])
-                ariaType = "pair"
-              } else if (e[1] != undefined && Value.isFunction(e[1])) {
-                strVal = ("PROCEDURE")
-                ariaType = "procedure"
-                HTMLVal = e[1].toString()//"PROCEDURE"
-              } else if (e[1] != undefined && Value.isStruct(e[1])) {
-                HTMLVal = drawStructHTML(e[1])
-                ariaType = 'struct'
-                console.log("STRUCT")
-                console.log(e[1])
-              } else {
-                console.log("Found none for type " + Value.typeOf(e[1]))
-              }
-              
-
-              //draw
-              let div = document.createElement('div')
-              div.textContent = e[0] + ' → '
-              div.style.display = 'flex'
-              div.ariaLabel = e[0] + " points to " + ariaType
-              div.ariaDescription = e[0] + " points to " + ariaType
-              div.append(HTMLVal)
-              this.jumpToList!.push(HTMLVal)
-              div.addEventListener('keydown', (event) => {
-                    if(event.key === 'j' && event.ctrlKey) {
-                      if(this.jumpToList![this.jumpToList!.indexOf(HTMLVal) + 1]) {
-                        this.jumpToList![this.jumpToList!.indexOf(HTMLVal) + 1].focus()
-                     }
-                    }
-                  })
-              renderToDraw(this.display, div)
+            if (!strVal || !value) {
+              return;
             }
+            if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+              strVal = strVal
+              if (typeof value === 'string') {
+                HTMLVal = "\"" + value + "\""
+              } else {
+                HTMLVal = value.toString()
+              }
+              ariaType = typeof value
+            } else if (Value.typeOf(value) === 'vector') {
+              strVal = drawVector(value) + ' Vetcor Height ' + (vectorHeight(value) + 1)
+              HTMLVal = drawVectorHTML(value)
+              ariaType = "vector"
+            } else if (Value.typeOf(value) === 'list') {
+              strVal = drawList(value) + ' List Height == ' + (listHeight(value) + 1)
+              HTMLVal = drawListHTML(value)
+              ariaType = "list"
+            } else if (Value.isPair(value)) {
+              strVal = drawPair(value)
+              HTMLVal = drawPairHTML(value)
+              ariaType = "pair"
+            } else if (Value.isFunction(value)) {
+              strVal = ("PROCEDURE")
+              ariaType = "procedure"
+              HTMLVal = value.toString()//"PROCEDURE"
+            } else if (Value.isStruct(value)) {
+              HTMLVal = drawStructHTML(value)
+              ariaType = 'struct'
+              console.log("STRUCT")
+              console.log(value)
+            } else {
+              console.log("Found none for type " + Value.typeOf(value))
+            }
+
+            // draw
+            let div = document.createElement('div')
+            div.textContent = id + ' → '
+            div.style.display = 'flex'
+            div.ariaLabel = id + " points to " + ariaType
+            div.ariaDescription = id + " points to " + ariaType
+            div.append(HTMLVal)
+            this.jumpToList!.push(HTMLVal)
+            div.addEventListener('keydown', (event) => {
+              if (event.key === 'j' && event.ctrlKey) {
+                if (this.jumpToList![this.jumpToList!.indexOf(HTMLVal) + 1]) {
+                  this.jumpToList![this.jumpToList!.indexOf(HTMLVal) + 1].focus()
+                }
+              }
+            })
+            renderToDraw(this.display, div)
             //console.log(this.jumpToList)
           })
 
@@ -1686,7 +1686,7 @@ export class Sem {
               }
             } else {//catch
               stackString = ("PROCEDURE")
-              
+              console.log(stackString)
             }
           }
         }
