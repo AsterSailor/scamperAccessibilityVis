@@ -1195,14 +1195,12 @@ function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID:
 function drawStructHTML(struct: Value.Struct) {
   let div = document.createElement('div');
   div.tabIndex = 0;
-  div.style.flex = 'true'
+  //div.className = 'list-style'
   //div.style.position = 'relative';
   //div.style.position = 'relative';
 
   const col = document.createElement('div');
-    col.className = 'vector-style';
-    //col.style.position = 'absolute'
-    col.style.left = `${30}px`
+    ///col.style.left = `${30}px`
   const col2 = document.createElement('div');
     col2.style.margin = "-3"
     //col.style.position = 'absolute'
@@ -1215,23 +1213,29 @@ function drawStructHTML(struct: Value.Struct) {
 
     
   for (const thing in struct) {
+
+
+    const row = document.createElement('div');
+    row.style.left = `${30}px`
+    row.style.display = 'flex'
+
+
     let t = struct[thing]
     let h = 0
     let s = thing.toString() + "      "
-    let i = 0
 
     if(typeof t === 'string' || typeof t === 'number' || typeof t === 'boolean' ) {
-      h = 1
+      h = 1 + 5
     } else if (Value.isPair(t)) {
       if(t.isList) {
-        h = listHeight(t) * 1.5
+        h = listHeight(t) * 1.5 + 1
       } else {
-        h = pairHeight(t) * 1.5
+        h = pairHeight(t) * 1.5 + 1
       }
     } else if (Value.typeOf(t) === 'vector') {
-      h = vectorHeight(t) * 1.5
+      h = vectorHeight(t) * 1.5 + 1
     } else if (Value.isNull(t)) {
-      h = 1
+      h = 1 + 1
     }
 
     // for(let i = 0; i <= h; i++) {
@@ -1247,15 +1251,17 @@ function drawStructHTML(struct: Value.Struct) {
       box.tabIndex = 0;
       box.ariaDescription = `no`
       box.ariaLabel = `no`
-      box.style.height = h.toString()
+      //box.style.height = h.toString()
+      box.style.flex = 'auto'
       box.innerHTML = s
-      console.log("STRUCT LENGTHHHH", struct.length)
-      if(i !== 0) {
-        box.style.borderTopWidth = '0'
-      } else if (i !== struct.length - 1) {
-        box.style.borderBottomWidth = '0'
-      }
-      col.appendChild(box);
+      console.log("STRUCT LENGTHHHH", Object.keys.length)
+      // if(i !== 0) {
+      //   box.style.borderTopWidth = '0'
+      // } else if (i !== Object.keys.length - 1) {
+      //   box.style.borderBottomWidth = '0'
+      // }
+      // i = i + 1
+      row.appendChild(box);
 
     const nextArrow = document.createElement('div');
       nextArrow.className = 'list-arrow';
@@ -1265,9 +1271,29 @@ function drawStructHTML(struct: Value.Struct) {
     const miniDiv = document.createElement('div');
       //miniDiv.style.flex = "true"
       miniDiv.className = 'list-style'
+      //miniDiv.style.flex = 'auto'
       miniDiv.appendChild(nextArrow)
       miniDiv.appendChild(arrowHead)
-      col2.appendChild(miniDiv);
+      row.appendChild(miniDiv);
+
+
+      if(typeof t === 'string' || typeof t === 'number' || typeof t === 'boolean') {
+        let val2 = document.createElement('div');
+        val2.className = 'val-box';
+        if(typeof t === 'string') {
+          val2.innerHTML = '\"' + t.toString() + '\"'
+        }
+      } else if (Value.isPair(t)) {
+        if(t.isList) {
+          row.appendChild(drawListHTML(t));
+        } else {
+          row.appendChild(drawPairHTML(t));
+        }
+      } else if (Value.typeOf(t) === 'vector') {
+        row.appendChild(drawVectorHTML(t));
+      }
+
+    col.appendChild(row)
   }
 
     
