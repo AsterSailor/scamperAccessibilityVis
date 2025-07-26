@@ -1,5 +1,13 @@
 import {AST} from "./ast";
 
+export function structLength(struct: Value.Struct) {
+  let length = 0
+  for (let thing in struct) {
+    length = length + 1
+  }
+  return length
+}
+
 export class Loc {
   line: number
   col: number
@@ -423,7 +431,7 @@ export class Env {
       const iterator0 = this.bindings[Symbol.iterator]();
       let count0 = 0
       for (const item of iterator0) {
-        if(count0 > 3) { //if you (yes, you) ever want to skip the middle two elements, just do count !== 1 && count !== 2
+        if(count0 > structLength(item) - 2) { //if you (yes, you) ever want to skip the middle two elements, just do count !== 1 && count !== 2
           kernel.push(item)
         }
         count0 += 1
@@ -437,7 +445,7 @@ export class Env {
         const iterator2 = parent!.bindings[Symbol.iterator]();
         let count = 0
         for (const item of iterator2) {
-          if(count > 3) { //change this too (yes, you)
+          if(count > boundLength(iterator0) - 2) { //change this too (yes, you)
             kernel.push(item)
           }
           count += 1

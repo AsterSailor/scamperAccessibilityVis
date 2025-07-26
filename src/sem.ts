@@ -1,5 +1,5 @@
 import { ICE, Id, Library, Range, ScamperError, Stmt } from './lang.js'
-import { Env, Prog, Op, reservedWords, Value, } from './lang.js'
+import { Env, Prog, Op, reservedWords, Value, structLength} from './lang.js'
 import { renderToHTML, mkCodeElement, mkSourceBlock, renderToOutput , renderToDraw } from './display.js'
 import * as C from './contract.js'
 //@ts-ignore
@@ -862,6 +862,8 @@ function listHeight(list: any): number {
         }
       } else if(Value.typeOf(fst) === 'vector') {
         height = height + vectorHeight(fst)
+      } else if (Value.isStruct(fst)) {
+        height = height + structHeight(fst)
       }
     } else {
       if(typeof fst === 'string' || typeof fst === 'number' || typeof fst === 'boolean') {
@@ -874,6 +876,9 @@ function listHeight(list: any): number {
         }
       } else if(Value.typeOf(fst) === 'vector') {
         height = height + vectorHeight(fst) - 1 + listHeight(list.snd)
+      } else if (Value.isStruct(fst)) {
+        height = height + structHeight(fst) + listHeight(list.snd)
+        height = height + 3
       }
     }
   }
@@ -1042,6 +1047,8 @@ function drawListHTML(list: any, nesting: number = 0, parent: number = 0, imgID:
         }
       } else if (Value.typeOf(el) === 'vector') {
         col.appendChild(drawVectorHTML(el, nesting + 1, i, imgID));
+      } else if (Value.isStruct(el)) {
+        col.appendChild(drawStructHTML(el))
       }
       
       //iterates the list
@@ -1091,6 +1098,8 @@ function pairHeight(pair: any) {
     }
   } else if (Value.typeOf(snd) === 'vector') {
     height = height + vectorHeight(snd)
+  } else if (Value.isStruct(snd)) {
+    height = structHeight(snd)
   }
 
   //height of pair.fst
@@ -1104,6 +1113,8 @@ function pairHeight(pair: any) {
     }
   } else if (Value.typeOf(fst) === 'vector') {
     height = height + vectorHeight(fst) - 1
+  } else if (Value.isStruct(fst)) {
+    height = structHeight(fst)
   }
 
   return height
@@ -1157,6 +1168,8 @@ function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID:
         }
       } else if (Value.typeOf(snd) === 'vector') {
         height = height + vectorHeight(snd)
+      } else if (Value.isStruct(snd)) {
+        height = structHeight(snd)
       }
     }
 
@@ -1186,10 +1199,35 @@ function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID:
       }
     } else if (Value.typeOf(e) === 'vector') {
       col.appendChild(drawVectorHTML(e, nesting + 1, k, imgID));
+    } else if (Value.isStruct(e)) {
+      col.appendChild(drawStructHTML(e))
     }
      div.appendChild(col);
   }
   return div;
+}
+
+
+function structHeight(struct: Value.Struct) {
+  let height = 0
+  for (let thing in struct) {
+    thing = struct[thing]
+    if(typeof thing === 'string' || typeof thing === 'number' || typeof thing === 'boolean' ) {
+      height = height + 1
+    } else if (Value.isPair(thing)) {
+      //@ts-ignore
+      if(thing.isList) {
+        height = height + listHeight(thing)
+      } else {
+        height = height + pairHeight(thing)
+      }
+    } else if (Value.typeOf(thing) === 'vector') {
+      height = height + vectorHeight(thing)
+    } else if (Value.isStruct(thing)) {
+      height = height + structHeight(thing)
+    }
+  }
+  return height
 }
 
 function drawStructHTML(struct: Value.Struct) {
@@ -1224,19 +1262,19 @@ function drawStructHTML(struct: Value.Struct) {
     let h = 0
     let s = thing.toString() + "      "
 
-    if(typeof t === 'string' || typeof t === 'number' || typeof t === 'boolean' ) {
-      h = 1 + 5
-    } else if (Value.isPair(t)) {
-      if(t.isList) {
-        h = listHeight(t) * 1.5 + 1
-      } else {
-        h = pairHeight(t) * 1.5 + 1
-      }
-    } else if (Value.typeOf(t) === 'vector') {
-      h = vectorHeight(t) * 1.5 + 1
-    } else if (Value.isNull(t)) {
-      h = 1 + 1
-    }
+    // if(typeof t === 'string' || typeof t === 'number' || typeof t === 'boolean' ) {
+    //   h = 1 + 5
+    // } else if (Value.isPair(t)) {
+    //   if(t.isList) {
+    //     h = listHeight(t) + 5
+    //   } else {
+    //     h = pairHeight(t) + 5
+    //   }
+    // } else if (Value.typeOf(t) === 'vector') {
+    //   h = vectorHeight(t) + 5
+    // } else if (Value.isNull(t)) {
+    //   h = 1 + 5
+    // }
 
     // for(let i = 0; i <= h; i++) {
     //   s += "\n"
