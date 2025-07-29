@@ -431,12 +431,23 @@ export class Env {
       const iterator0 = this.bindings[Symbol.iterator]();
       let count0 = 0
       for (const item of iterator0) {
-        if(count0 > structLength(item) - 2) { //if you (yes, you) ever want to skip the middle two elements, just do count !== 1 && count !== 2
+        console.log(item, "ITEEMMM")
+        //if(!item[1]) {
+          console.log("opopop")
+          if (!Value.isFunction(item) && item[0]) {
+            console.log(item)
+            count0 = 1
+            console.log('yeeeeee')
+            //kernel.push(item)
+          }
+        //}
+        if (count0 > 0) { //if you (yes, you) ever want to skip the middle two elements, just do count !== 1 && count !== 2
           kernel.push(item)
         }
-        count0 += 1
       }
       kernel.reverse()
+
+      //this is repeated for all children
       for(let i = 0; i < kernel.length; i++) {
         bounds.push(kernel[i])
       }
@@ -445,10 +456,18 @@ export class Env {
         const iterator2 = parent!.bindings[Symbol.iterator]();
         let count = 0
         for (const item of iterator2) {
-          if(count > boundLength(iterator0) - 2) { //change this too (yes, you)
+          console.log(item, "ITEEMMM 2")
+          if(!item[1]) {
+            console.log("opopop")
+            if (!Value.isFunction(item)) {
+            count = 1
+            console.log('yeeeeee')
+            kernel.push(item)
+            }
+          }
+          if(count > 0) { //change this too (yes, you)
             kernel.push(item)
           }
-          count += 1
         }
         kernel.reverse()
         for(let i = 0; i < kernel.length; i++) {

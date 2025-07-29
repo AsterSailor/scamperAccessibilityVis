@@ -793,7 +793,11 @@ function drawVectorHTML(vector: any, nesting: number = 0, parent: number = 0, im
     let val2 = document.createElement('div');
     val2.className = 'val-box';
     if(typeof e === 'string' || typeof e === 'number' || typeof e === 'boolean') {
-      val2.textContent = e.toString();
+      if(typeof e === 'string'){
+        val2.textContent = "\"" + e + "\""
+      } else {
+        val2.textContent = e + '';
+      }
       col.appendChild(val2);
     } else if (Value.isPair(e)) {
       if(e.isList) {
@@ -1037,7 +1041,11 @@ function drawListHTML(list: any, nesting: number = 0, parent: number = 0, imgID:
       const val2 = document.createElement('div');
       val2.className = 'val-box';
       if(typeof el === 'string' || typeof el === 'number' || typeof el === 'boolean') {
-        val2.textContent = el.toString()
+        if(typeof el === 'string'){
+          val2.textContent = "\"" + el + "\""
+        } else {
+          val2.textContent = el + '';
+        }
         col.appendChild(val2);
       } else if (Value.isPair(el)) {
         if(el.isList) {
@@ -1189,7 +1197,11 @@ function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID:
     val2.className = 'val-box';
     //creates the box containing the value in the element
     if(typeof e === 'string' || typeof e === 'number' || typeof e === 'boolean') {
-      val2.textContent = e.toString();
+      if(typeof e === 'string'){
+        val2.textContent = "\"" + e + "\""
+      } else {
+        val2.textContent = e + '';
+      }
       col.appendChild(val2);
     } else if (Value.isPair(e)) {
       if(e.isList) {
