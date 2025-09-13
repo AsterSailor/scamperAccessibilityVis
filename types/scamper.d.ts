@@ -2,6 +2,7 @@ import { Env, ParserOutput, Prog } from './lang.js';
 import * as Sem from './sem.js';
 export type ScamperOptions = {
     isTracing: boolean;
+    isDrawing: boolean;
     isPrintingCode: boolean;
     initialEnv?: Env;
     defaultDisplay: boolean;
@@ -11,11 +12,13 @@ export declare class Scamper {
     env: Env;
     display: HTMLElement;
     isTracing: boolean;
+    isDrawing: boolean;
     parseroutput: ParserOutput;
     prog: Prog;
     sem: Sem.Sem;
     constructor(display: HTMLElement, src: string, opts: ScamperOptions);
     runProgram(): void;
+    runnerTree(): void;
     stepProgram(): void;
     stepStmtProgram(): void;
 }

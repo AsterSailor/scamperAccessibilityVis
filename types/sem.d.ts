@@ -1,5 +1,6 @@
 import { Id, Library, Range } from './lang.js';
 import { Env, Prog, Op, Value } from './lang.js';
+import './styles.css';
 declare class Control {
     idx: number;
     ops: Op.T[];
@@ -20,6 +21,8 @@ declare class ExecutionState {
     isDumpEmpty(): boolean;
     popDump(): void;
     jumpPast(label: Op.Label): void;
+    getBoundsEnv(libNum: number): [Id, Value.T][] | undefined;
+    getStack(): Value.T[];
 }
 export declare function opsToValue(ops: Op.T[]): Value.T;
 export declare function stateToExp(state: ExecutionState): Value.T | undefined;
@@ -34,9 +37,13 @@ export declare class Sem {
     state?: ExecutionState;
     builtinLibs: Map<Id, Library>;
     traces?: HTMLElement[];
+    draws?: HTMLElement[];
+    states: never[];
     defaultDisplay: boolean;
     isPrintingCode: boolean;
-    constructor(display: HTMLElement, builtinLibs: Map<Id, Library>, isTracing: boolean, defaultDisplay: boolean, isPrintingCode: boolean, env: Env, prog: Prog, src: string);
+    isDrawing: boolean;
+    jumpToList?: HTMLElement[];
+    constructor(display: HTMLElement, builtinLibs: Map<Id, Library>, isTracing: boolean, isDrawing: boolean, defaultDisplay: boolean, isPrintingCode: boolean, env: Env, prog: Prog, src: string);
     isFinished(): boolean;
     isTracing(): boolean;
     appendToCurrentTrace(v: HTMLElement | string): void;
@@ -50,6 +57,7 @@ export declare class Sem {
     step(): void;
     stepToNextStmt(): void;
     execute(): void;
+    draw(): void;
 }
 export {};
 //# sourceMappingURL=sem.d.ts.map

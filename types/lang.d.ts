@@ -1,4 +1,5 @@
 import { AST } from "./ast";
+export declare function structLength(struct: Value.Struct): number;
 export declare class Loc {
     line: number;
     col: number;
@@ -89,7 +90,7 @@ export declare namespace Value {
     const isPair: (v: T) => boolean;
     const isList: (v: T) => boolean;
     const isSyntax: (v: T) => boolean;
-    const isStruct: (v: T) => boolean;
+    const isStruct: (v: T) => v is Struct;
     const isStructKind: (v: T, k: string) => boolean;
     const mkClosure: (arity: number, params: Id[], ops: Op.T[], env: Env) => T;
     const mkChar: (v: string) => Char;
@@ -252,6 +253,7 @@ export declare namespace Op {
 export declare class Env {
     private bindings;
     private parent?;
+    static stringed: string;
     constructor(bindings: [Id, Value.T][], parent?: Env);
     has(name: Id): boolean;
     get(name: Id): Value.T | undefined;
@@ -260,6 +262,7 @@ export declare class Env {
     remove(...names: Id[]): void;
     clone(): Env;
     quotient(...names: Id[]): Env;
+    toString2(libNum: number): [string, Value.T][];
 }
 export type Library = {
     lib: [string, Value.T][];
