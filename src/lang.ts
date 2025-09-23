@@ -417,6 +417,7 @@ export class Env {
     let parent = this.parent
     //const iterator1 = this.bindings[Symbol.iterator]();
     
+    //if there is no parent environment
     if(this.parent === undefined) {
       const iterator1 = this.bindings[Symbol.iterator]();
       let count = -7
@@ -426,24 +427,16 @@ export class Env {
         }
         count += 1;
       }
-    } else {
-      let kernel = []
+    } else { // there are structs and nested environments
+      let kernel = [] // array to be flipped later
       const iterator0 = this.bindings[Symbol.iterator]();
-      let count0 = 0
+      //let count0 = 0
+      
+
       for (const item of iterator0) {
-        console.log(item, "ITEEMMM")
-        //if(!item[1]) {
-          console.log("opopop")
-          if (!Value.isFunction(item) && item[0]) {
-            console.log(item)
-            count0 = 1
-            console.log('yeeeeee')
-            //kernel.push(item)
-          }
-        //}
-        if (count0 > 0) { //if you (yes, you) ever want to skip the middle two elements, just do count !== 1 && count !== 2
-          kernel.push(item)
-        }
+
+        kernel.push(item)
+        
       }
       kernel.reverse()
 
@@ -451,23 +444,20 @@ export class Env {
       for(let i = 0; i < kernel.length; i++) {
         bounds.push(kernel[i])
       }
+
+
       while(parent!.parent !== undefined) {
         let kernel = []
         const iterator2 = parent!.bindings[Symbol.iterator]();
         let count = 0
         for (const item of iterator2) {
-          console.log(item, "ITEEMMM 2")
-          if(!item[1]) {
-            console.log("opopop")
-            if (!Value.isFunction(item)) {
-            count = 1
-            console.log('yeeeeee')
-            kernel.push(item)
-            }
-          }
-          if(count > 0) { //change this too (yes, you)
-            kernel.push(item)
-          }
+          
+          kernel.push(item)
+          
+          
+          // if(count > 0) { //change this too (yes, you)
+          //   kernel.push(item)
+          // }
         }
         kernel.reverse()
         for(let i = 0; i < kernel.length; i++) {
@@ -475,6 +465,8 @@ export class Env {
         }
         parent = parent!.parent
       }
+
+      //the same as no nested environments, but with a kernel
       const iterator3 = parent!.bindings[Symbol.iterator]();
       kernel = []
       let count = -7

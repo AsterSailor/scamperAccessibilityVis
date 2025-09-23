@@ -1618,7 +1618,7 @@ export class Sem {
 
       //grabs bounded values from the environment
       let bounded = envState.getBoundsEnv(initialLibNum)
-
+      
       //grabs the stack
       let stack = envState.getStack()
 
@@ -1644,12 +1644,17 @@ export class Sem {
           renderToDraw(this.display, div1)
           this.jumpToList?.push(div1)
 
+          // parallel arrays for keeping divs and their names
+          let list_names: String[] = [];
+          let list_div: HTMLElement[] = [];
+
           //for each bounded variable
           bounded?.forEach(([id, value]) => {
             let strVal: any = value?.toString()
 
             let HTMLVal: any = ''
             let ariaType = ""
+            let structName = false;
 
             //typecheck the variable(s) and convert to string or HTML elements
             if (!strVal || !value) {
@@ -1683,12 +1688,14 @@ export class Sem {
               HTMLVal = drawStructHTML(value)
               ariaType = 'struct'
               console.log("STRUCT")
-              console.log(value)
+              console.log(value[0])
+              structName = value[0];
             } else {
               console.log("Found none for type " + Value.typeOf(value))
             }
 
-            // draw
+            
+            // make div to be drawn later
             let div = document.createElement('div')
             div.textContent = id + ' → '
             div.style.display = 'flex'
@@ -1703,10 +1710,24 @@ export class Sem {
                 }
               }
             })
-            renderToDraw(this.display, div)
+            console.log(structName + id)
+            if(structName) {
+                console.log(list_names)
+                console.log(list_div)
+              for(let i = 0; i < list_names.length; i++) {
+                
+                if(list_names[i].startsWith(structName)) {
+                  list_names.splice(i, 1);
+                  list_div.splice(i,1);
+                }
+              }
+            }
+            list_names.push(id);
+            list_div.push(div)
             //console.log(this.jumpToList)
           })
-
+          list_div.forEach(e => renderToDraw(this.display, e) );
+          
           //environment end line
           let div2 = document.createElement('div')
           div2.ariaLabel = "End environment"
