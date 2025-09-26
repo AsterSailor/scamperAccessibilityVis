@@ -1333,6 +1333,7 @@ function drawStructHTML(struct: Value.Struct) {
         if(typeof t === 'string') {
           val2.innerHTML = '\"' + t.toString() + '\"'
         }
+        row.appendChild(val2);
       } else if (Value.isPair(t)) {
         if(t.isList) {
           row.appendChild(drawListHTML(t));
@@ -1660,7 +1661,7 @@ export class Sem {
             if (!strVal || !value) {
               return;
             }
-            if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+            if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' || strVal === "0") {
               strVal = strVal
               if (typeof value === 'string') {
                 HTMLVal = "\"" + value + "\""
@@ -1683,12 +1684,12 @@ export class Sem {
             } else if (Value.isFunction(value)) {
               strVal = ("PROCEDURE")
               ariaType = "procedure"
-              HTMLVal = value.toString()//"PROCEDURE"
+              HTMLVal = "PROCEDURE"
             } else if (Value.isStruct(value)) {
               HTMLVal = drawStructHTML(value)
               ariaType = 'struct'
-              console.log("STRUCT")
-              console.log(value[0])
+              //console.log("STRUCT")
+              //console.log(value[0])
               structName = value[0];
             } else {
               console.log("Found none for type " + Value.typeOf(value))
@@ -1712,8 +1713,8 @@ export class Sem {
             })
             console.log(structName + id)
             if(structName) {
-                console.log(list_names)
-                console.log(list_div)
+                //console.log(list_names)
+                //console.log(list_div)
               for(let i = 0; i < list_names.length; i++) {
                 
                 if(list_names[i].startsWith(structName)) {
@@ -1748,7 +1749,7 @@ export class Sem {
         stackString = stack[stack.length - 1]?.toString()
 
         //type check and convert to string or HTML element
-        if(typeof stack[0] != 'string' && typeof stack[0] != 'number' && typeof stack[0] != 'boolean') {
+        if(typeof stack[0] != 'string' && typeof stack[0] != 'number' && typeof stack[0] != 'boolean' || stack[0] === 0) {
           if(stack[0] != undefined && Value.typeOf(stack[0]) === 'vector') {
             stackString = drawVector(stack[0])
             stackHTML = drawVectorHTML(stack[0])

@@ -1,4 +1,5 @@
 import {AST} from "./ast";
+import { boolean } from "./contract";
 
 export function structLength(struct: Value.Struct) {
   let length = 0
@@ -432,10 +433,36 @@ export class Env {
       const iterator0 = this.bindings[Symbol.iterator]();
       //let count0 = 0
       
-
+      let structFound = null;
+      let structLength = 2;
+      let structString = null;
       for (const item of iterator0) {
+        // if(Value.isStruct(item[1])) {
+        //   console.log(item[0] + " is a struct")
+        //   structFound = item[0];
+        //   console.log(item)
+        //   for(const e in item[1]) {
+        //     console.log("I FOUND THIS BITCHHH" + e)
+        //     structLength
+        //   }
+        // }
+        // if(structFound) {
+        //   console.log(item[0] + " is after a struct")
+        //   if(item[0].substring(0, item[0].length + 1) === item[0] + "-" || item[0].includes(item + "?")) {
+        //     console.log("BINGOOOOOO" + item[0])
+        //   }
+        // }
+        if(!structString) {
+          structString = item[0].substring(0, item[0].length - 1) //remove -? from end
+        }
+        console.log("structString is " + structString)
+        if(!(item[0].includes(structString) || item[0].includes(structString + "-") || item[0].includes(structString + "?"))) {
+          kernel.push(item)
+          console.log("WINNERRRRRRR")
+        }
+        
 
-        kernel.push(item)
+        
         
       }
       kernel.reverse()
@@ -450,10 +477,38 @@ export class Env {
         let kernel = []
         const iterator2 = parent!.bindings[Symbol.iterator]();
         let count = 0
+        let structString = null;
         for (const item of iterator2) {
           
-          kernel.push(item)
           
+          
+          // if(Value.isStruct(item[1])) {
+          //   console.log(item[0] + " is a struct")
+          //   structFound = item[0];
+          //   console.log(item)
+          //   for(const e in item[1]) {
+          //     console.log("I FOUND THIS BITCHHH" + e)
+          //   }
+          // }
+          // if(structFound) {
+          //   console.log(item[0] + " is after a struct")
+          //   if(item[0].substring(0, item[0].length + 1) === item[0] + "-" || item[0].includes(item + "?")) {
+          //     console.log("BINGOOOOOO" + item[0])
+          //     // if(item[0].includes(item + "?")) {
+          //     //   structFound = null;
+          //     // }
+          //   }
+            
+          // }
+          if(!structString) {
+            structString = item[0].substring(0, item[0].length - 1) //remove -? from end
+          }
+          console.log("structString is " + structString)
+          if(!(item[0].includes(structString) || item[0].includes(structString + "-") || item[0].includes(structString + "?"))) {
+            kernel.push(item)
+            console.log("WINNERRRRRRR")
+          }
+
           
           // if(count > 0) { //change this too (yes, you)
           //   kernel.push(item)
