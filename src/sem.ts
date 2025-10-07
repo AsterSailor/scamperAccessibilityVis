@@ -712,6 +712,9 @@ function vectorHeight(vec: any, index: number = 0): number {
       }
     } else if(Value.typeOf(e) === 'vector') {
       height = height + vectorHeight(e, 0) 
+    } else if (Value.isStruct(e)) {
+      height = height + structHeight(e)
+      height = height + 1
     }
   }
   return height + 3
@@ -807,6 +810,8 @@ function drawVectorHTML(vector: any, nesting: number = 0, parent: number = 0, im
       }
     } else if (Value.typeOf(e) === 'vector') {
       col.appendChild(drawVectorHTML(e, nesting + 1, i, imgID));
+    } else if (Value.isStruct(e)) {
+      col.appendChild(drawStructHTML(e))
     }
 
     div.appendChild(col);
@@ -1342,7 +1347,7 @@ function drawStructHTML(struct: Value.Struct) {
         }
       } else if (Value.typeOf(t) === 'vector') {
         row.appendChild(drawVectorHTML(t));
-      }
+      } 
 
     col.appendChild(row)
   }
