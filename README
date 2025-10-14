@@ -1,0 +1,30 @@
+# Scamper
+
+A mini-Scheme implementation designed for teaching, targeting multimedia applications on the web.
+
+## Development
+
+To run a local instance of Scamper for development purposes:
+
+~~~console
+$> npm install    # Install NPM dependencies
+$> npm run dev    # Spawns a local vite server to serve the application
+~~~
+
+Follow the terminal instructions to connect to your local Scamper instance.
+
+## Deployment
+
+The deployment script builds Scamper and copies it to `<server>:<root>/<version>` and adds `<server>:<root>/index.html` which redirects to this latest version.
+The deployment script also requires that you are on Mac/Linux and the `compsci` host points to the correct web server.
+
+~~~console
+$> npm run deploy   # Deploys Scamper
+~~~
+
+## Information about the Visualizations
+
+The pencil button uses the tracing function of the IDE to create HTML elements of each data structure as the code declares them. The draw() function in sem.ts is the
+majority of the computatons for the drawings, and following the implementation can allow one to find the functions for drawing each data structure.
+The complexity of running through the elements in an environment ( Env class in lang.ts inside function toString2() ) come from the behavior where structs are called.
+The compiler creates a nested environment with a parent environment to mimic control flow.
