@@ -1,14 +1,6 @@
 import {AST} from "./ast";
 import { boolean } from "./contract";
 
-export function structLength(struct: Value.Struct) {
-  let length = 0
-  for (let thing in struct) {
-    length = length + 1
-  }
-  return length
-}
-
 export class Loc {
   line: number
   col: number
@@ -437,31 +429,14 @@ export class Env {
       let structLength = 2;
       let structString = null;
       for (const item of iterator0) {
-        // if(Value.isStruct(item[1])) {
-        //   console.log(item[0] + " is a struct")
-        //   structFound = item[0];
-        //   console.log(item)
-        //   for(const e in item[1]) {
-        //     console.log("I FOUND THIS BITCHHH" + e)
-        //     structLength
-        //   }
-        // }
-        // if(structFound) {
-        //   console.log(item[0] + " is after a struct")
-        //   if(item[0].substring(0, item[0].length + 1) === item[0] + "-" || item[0].includes(item + "?")) {
-        //     console.log("BINGOOOOOO" + item[0])
-        //   }
-        // }
+        
         if(!structString) {
           structString = item[0].substring(0, item[0].length - 1) //remove -? from end
         }
-        console.log("structString is " + structString)
+        
         if(!(item[0].includes(structString) || item[0].includes(structString + "-") || item[0].includes(structString + "?"))) {
           kernel.push(item)
-          console.log("WINNERRRRRRR")
         }
-        
-
         
         
       }
@@ -476,43 +451,19 @@ export class Env {
       while(parent!.parent !== undefined) {
         let kernel = []
         const iterator2 = parent!.bindings[Symbol.iterator]();
-        let count = 0
+        //let count = 0
         let structString = null;
         for (const item of iterator2) {
           
-          
-          
-          // if(Value.isStruct(item[1])) {
-          //   console.log(item[0] + " is a struct")
-          //   structFound = item[0];
-          //   console.log(item)
-          //   for(const e in item[1]) {
-          //     console.log("I FOUND THIS BITCHHH" + e)
-          //   }
-          // }
-          // if(structFound) {
-          //   console.log(item[0] + " is after a struct")
-          //   if(item[0].substring(0, item[0].length + 1) === item[0] + "-" || item[0].includes(item + "?")) {
-          //     console.log("BINGOOOOOO" + item[0])
-          //     // if(item[0].includes(item + "?")) {
-          //     //   structFound = null;
-          //     // }
-          //   }
-            
-          // }
           if(!structString) {
             structString = item[0].substring(0, item[0].length - 1) //remove -? from end
           }
-          console.log("structString is " + structString)
+          //console.log("structString is " + structString)
           if(!(item[0].includes(structString) || item[0].includes(structString + "-") || item[0].includes(structString + "?"))) {
             kernel.push(item)
-            console.log("WINNERRRRRRR")
+            //console.log("WINNERRRRRRR")
           }
 
-          
-          // if(count > 0) { //change this too (yes, you)
-          //   kernel.push(item)
-          // }
         }
         kernel.reverse()
         for(let i = 0; i < kernel.length; i++) {
@@ -556,4 +507,12 @@ export function registerValue (name: string, v: Value.T, library: Library) {
     Value.nameFn(name, v)
   }
   library.lib.push([name, v])
+}
+
+export function structLength(struct: Value.Struct) {
+  let length = 0
+  for (let thing in struct) {
+    length = length + 1
+  }
+  return length
 }

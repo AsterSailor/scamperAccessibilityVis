@@ -1,5 +1,4 @@
 import { AST } from "./ast";
-export declare function structLength(struct: Value.Struct): number;
 export declare class Loc {
     line: number;
     col: number;
@@ -270,5 +269,6 @@ export type Library = {
 };
 export declare function emptyLibrary(): Library;
 export declare function registerValue(name: string, v: Value.T, library: Library): void;
+export declare function structLength(struct: Value.Struct): number;
 export {};
 //# sourceMappingURL=lang.d.ts.map

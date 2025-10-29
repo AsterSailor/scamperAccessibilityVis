@@ -1,5 +1,5 @@
 import { ICE, Id, Library, Range, ScamperError, Stmt } from './lang.js'
-import { Env, Prog, Op, reservedWords, Value, structLength} from './lang.js'
+import { Env, Prog, Op, reservedWords, Value} from './lang.js'
 import { renderToHTML, mkCodeElement, mkSourceBlock, renderToOutput , renderToDraw } from './display.js'
 import * as C from './contract.js'
 //@ts-ignore
@@ -1250,72 +1250,39 @@ function structHeight(struct: Value.Struct) {
 function drawStructHTML(struct: Value.Struct) {
   let div = document.createElement('div');
   div.tabIndex = 0;
-  //div.className = 'list-style'
-  //div.style.position = 'relative';
-  //div.style.position = 'relative';
+  
 
   const col = document.createElement('div');
+  //col.style.width = '';
     ///col.style.left = `${30}px`
   const col2 = document.createElement('div');
     col2.style.margin = "-3"
     //col.style.position = 'absolute'
     col2.style.left = `${30}px`
-  const col3 = document.createElement('div');
-    col3.className = 'vector-style';
-    //col.style.position = 'absolute'
-    col3.style.left = `${30}px`
 
-
+  let countThings = 0;
     
   for (const thing in struct) {
-
+    countThings++;
 
     const row = document.createElement('div');
+    row.id = "struct-row" + countThings
     row.style.left = `${30}px`
     row.style.display = 'flex'
-
+    row.style.flexDirection = 'row'
 
     let t = struct[thing]
-    let h = 0
     let s = thing.toString() + "      "
 
-    // if(typeof t === 'string' || typeof t === 'number' || typeof t === 'boolean' ) {
-    //   h = 1 + 5
-    // } else if (Value.isPair(t)) {
-    //   if(t.isList) {
-    //     h = listHeight(t) + 5
-    //   } else {
-    //     h = pairHeight(t) + 5
-    //   }
-    // } else if (Value.typeOf(t) === 'vector') {
-    //   h = vectorHeight(t) + 5
-    // } else if (Value.isNull(t)) {
-    //   h = 1 + 5
-    // }
-
-    // for(let i = 0; i <= h; i++) {
-    //   s += "\n"
-    // }
-    // string = string + s
-    // height += h
     const box = document.createElement('div');
-      box.id = "struct kind " + struct.kind
+      box.id = "struct-box"
       box.className = 'struct-box';
-      // let height = 0
-      // let string = ''
       box.tabIndex = 0;
       box.ariaDescription = `no`
       box.ariaLabel = `no`
-      //box.style.height = h.toString()
-      box.style.flex = 'auto'
+      
       box.innerHTML = s
-      console.log("STRUCT LENGTHHHH", Object.keys.length)
-      // if(i !== 0) {
-      //   box.style.borderTopWidth = '0'
-      // } else if (i !== Object.keys.length - 1) {
-      //   box.style.borderBottomWidth = '0'
-      // }
-      // i = i + 1
+      
       row.appendChild(box);
 
     const nextArrow = document.createElement('div');
@@ -1324,36 +1291,66 @@ function drawStructHTML(struct: Value.Struct) {
       arrowHead.className = 'arrow-box'
       arrowHead.textContent = '▶'
     const miniDiv = document.createElement('div');
-      //miniDiv.style.flex = "true"
       miniDiv.className = 'list-style'
-      //miniDiv.style.flex = 'auto'
       miniDiv.appendChild(nextArrow)
       miniDiv.appendChild(arrowHead)
       row.appendChild(miniDiv);
 
-
+      let HTMLVal = document.createElement('div'); // div to hold element to be drawn
+      
       if(typeof t === 'string' || typeof t === 'number' || typeof t === 'boolean') {
         let val2 = document.createElement('div');
         val2.className = 'val-box';
+        val2.innerHTML = t.toString();
         if(typeof t === 'string') {
           val2.innerHTML = '\"' + t.toString() + '\"'
         }
-        row.appendChild(val2);
+        val2.style.paddingTop = '5px'
+        val2.style.whiteSpace = 'noWrap';
+        HTMLVal = val2;
       } else if (Value.isPair(t)) {
         if(t.isList) {
-          row.appendChild(drawListHTML(t));
+          HTMLVal = drawListHTML(t);
         } else {
-          row.appendChild(drawPairHTML(t));
+          HTMLVal = drawPairHTML(t);
         }
       } else if (Value.typeOf(t) === 'vector') {
-        row.appendChild(drawVectorHTML(t));
-      } 
-
-    col.appendChild(row)
-  }
+        HTMLVal = drawVectorHTML(t);
+      } else if (Value.isStruct(t)) {
+        HTMLVal = drawStructHTML(t);
+      }
 
     
+    row.appendChild(HTMLVal);
+    
+    col.appendChild(row)
+    
+  }
 
+  if(countThings === 0) {
+    console.log("LEAF")
+    console.log(struct)
+    const row = document.createElement('div');
+    row.style.left = `${30}px`
+    row.style.display = 'flex'
+    row.style.flexDirection = 'row'
+
+    const box = document.createElement('div');
+      box.id = "empty struct"
+      box.className = 'struct-box';
+      
+      box.tabIndex = 0;
+      box.ariaDescription = `no`
+      box.ariaLabel = `no`
+      
+      box.innerHTML = "empty struct"
+      
+      row.appendChild(box);
+      col.appendChild(row)
+  }
+
+
+  //col.style.borderLeft = '2px solid black'
   div.appendChild(col);
   div.appendChild(col2)
 
@@ -1700,13 +1697,18 @@ export class Sem {
               console.log("Found none for type " + Value.typeOf(value))
             }
 
+            //make mini div for name and arrow
+            let miniDiv = document.createElement('div')
+            miniDiv.textContent = id + ' → '
+            miniDiv.style.whiteSpace = 'nowrap'
             
             // make div to be drawn later
             let div = document.createElement('div')
-            div.textContent = id + ' → '
+            
             div.style.display = 'flex'
             div.ariaLabel = id + " points to " + ariaType
             div.ariaDescription = id + " points to " + ariaType
+            div.appendChild(miniDiv)
             div.append(HTMLVal)
             this.jumpToList!.push(HTMLVal)
             div.addEventListener('keydown', (event) => {

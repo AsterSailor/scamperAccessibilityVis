@@ -113,21 +113,27 @@
     box-sizing: border-box;
     display: inline-block;
     vertical-align: middle;
-    //flex: 1
+    /*
+    flex: 1
+    */
 }
 
 .list-style {
-    display: flex;
+    display: inline-flex;
 }
 
 .vector-style {
     display: inline-flex;
+    /* Using column layout to stack child elements vertically within the struct-box */
     flex-direction: column;
     justify-content: flex-start;
+    
 }
 
 .struct-box {
     border: 2px solid black;
-    padding: 5px;
-    
+    padding: 5px; 
+    width: 70px;
+    height: 70px;
+    margin: 5px;
 }
