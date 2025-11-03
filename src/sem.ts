@@ -1261,6 +1261,7 @@ function drawStructHTML(struct: Value.Struct) {
     col2.style.left = `${30}px`
 
   let countThings = 0;
+  const numberOfElements = Object.keys(struct).length;
     
   for (const thing in struct) {
     countThings++;
@@ -1270,6 +1271,12 @@ function drawStructHTML(struct: Value.Struct) {
     row.style.left = `${30}px`
     row.style.display = 'flex'
     row.style.flexDirection = 'row'
+
+    if(countThings > 1 && countThings !== numberOfElements) {
+      const line = document.createElement('div');
+      line.className = 'struct-line';
+      row.appendChild(line!);
+    }
 
     let t = struct[thing]
     let s = thing.toString() + "      "
@@ -1300,13 +1307,13 @@ function drawStructHTML(struct: Value.Struct) {
       
       if(typeof t === 'string' || typeof t === 'number' || typeof t === 'boolean') {
         let val2 = document.createElement('div');
-        val2.className = 'val-box';
-        val2.innerHTML = t.toString();
+          val2.className = 'val-box';
+          val2.innerHTML = t.toString();
         if(typeof t === 'string') {
           val2.innerHTML = '\"' + t.toString() + '\"'
         }
-        val2.style.paddingTop = '5px'
-        val2.style.whiteSpace = 'noWrap';
+          val2.style.paddingTop = '5px'
+          val2.style.whiteSpace = 'noWrap';
         HTMLVal = val2;
       } else if (Value.isPair(t)) {
         if(t.isList) {
@@ -1321,8 +1328,7 @@ function drawStructHTML(struct: Value.Struct) {
       }
 
     
-    row.appendChild(HTMLVal);
-    
+    row.appendChild(HTMLVal)
     col.appendChild(row)
     
   }
@@ -1345,12 +1351,12 @@ function drawStructHTML(struct: Value.Struct) {
       
       box.innerHTML = "empty struct"
       
-      row.appendChild(box);
+      row.appendChild(box)
       col.appendChild(row)
   }
 
 
-  //col.style.borderLeft = '2px solid black'
+  //col.style.borderLeft = '2px solid black
   div.appendChild(col);
   div.appendChild(col2)
 
