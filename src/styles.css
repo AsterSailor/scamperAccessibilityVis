@@ -135,14 +135,15 @@
     padding: 5px; 
     width: 70px;
     height: 70px;
-    margin: 5px;
+    margin: 3px;
+    border-left: 6px solid black;
 }
 
 .struct-line {
-    border: 1px solid black;
+    border: 3px solid black;
     width: 0px;
-    margin-right: -7px;
-    margin-top: -5px;
-    margin-bottom: -5px;
-    margin-left: 5px;
+    margin-right: -5px;
+    margin-top: -3px;
+    margin-bottom: -3px;
+    margin-left: 3px;
 }

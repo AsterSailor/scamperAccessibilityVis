@@ -999,11 +999,13 @@ function drawListHTML(list: any, nesting: number = 0, parent: number = 0, imgID:
           }
         } else {
           box.id = `${nesting}:${i}:${parent}:${imgID} next`
+            box.style.marginLeft = '-2px';
           box.ariaDescription = `list pair ${i}, second element contains a list pair`;
           box.ariaLabel = `list pair ${i}, second element contains a list pair`;
         }
         if(i === len!-1 && j === 1) {
           box.className = 'null-box';
+            box.style.marginLeft = '-2px';
           box.ariaDescription = `list pair ${i}, second element contains null`;
           box.ariaLabel = `list pair ${i}, second element contains null`;
         } else {
