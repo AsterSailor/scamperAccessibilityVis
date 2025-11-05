@@ -4,6 +4,7 @@ import { renderToHTML, mkCodeElement, mkSourceBlock, renderToOutput , renderToDr
 import * as C from './contract.js'
 //@ts-ignore
 import './styles.css'
+import { count } from 'console'
 
 let maxCallStackDepth = 100000;
 
@@ -752,9 +753,11 @@ function drawVectorHTML(vector: any, nesting: number = 0, parent: number = 0, im
     //container for all the html elements for one vector element
     const col = document.createElement('div');
     col.className = 'vector-style';
-    if (i > 0) col.style.position = 'absolute';
+    if (i > 0){
+      col.style.marginLeft = '-2px'
+      //col.style.position = 'absolute';
+    }
     col.style.left = `${30 * vector.indexOf(e)}px`
-    //col.style.top = '20px'
 
     //creates the box elements of the vector
     const box = document.createElement('div');
@@ -1274,7 +1277,7 @@ function drawStructHTML(struct: Value.Struct) {
     row.style.display = 'flex'
     row.style.flexDirection = 'row'
 
-    if(countThings > 1 && countThings !== numberOfElements) {
+    if(/*countThings > 1 &&*/ countThings !== numberOfElements) {
       const line = document.createElement('div');
       line.className = 'struct-line';
       row.appendChild(line!);
@@ -1289,7 +1292,9 @@ function drawStructHTML(struct: Value.Struct) {
       box.tabIndex = 0;
       box.ariaDescription = `no`
       box.ariaLabel = `no`
-      
+      if(countThings === numberOfElements) {
+        box.style.borderLeft = '6px solid black'
+      }
       box.innerHTML = s
       
       row.appendChild(box);
