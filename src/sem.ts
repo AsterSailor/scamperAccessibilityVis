@@ -754,7 +754,7 @@ function drawVectorHTML(vector: any, nesting: number = 0, parent: number = 0, im
     const col = document.createElement('div');
     col.className = 'vector-style';
     if (i > 0){
-      col.style.marginLeft = '-2px'
+      col.style.marginLeft = '-3px'
       //col.style.position = 'absolute';
     }
     col.style.left = `${30 * vector.indexOf(e)}px`
@@ -1202,6 +1202,9 @@ function drawPairHTML(pair: any, nesting: number = 0, parent: number = 0, imgID:
     const val = document.createElement('div');
     val.className = 'val-box';
     val.textContent = '▼\n';
+    if (e === pair.snd) {
+      col.style.marginLeft = '-2px'
+    }
     col.appendChild(val);
     let val2 = document.createElement('div');
     val2.className = 'val-box';
