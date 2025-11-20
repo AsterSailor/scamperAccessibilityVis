@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+SERVER=compsci
+ROOT=scamper.cs.grinnell.edu
+VER=$1
+
+echo "Pointing scamper to ${VER} as latest..."
+
+cat << EOF | ssh ${SERVER} "cat > ${ROOT}/index.html"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="refresh" content="0; url=${VER}/">
+  <title>Redirecting to latest Scamper version (${VER})...</title>
+</head>
+<body>
+  <p>If you are not redirected automatically, follow this <a href="${VER}/">link to Scamper ${VER}</a>.</p>
+</body>
+</html></html>
+EOF 
