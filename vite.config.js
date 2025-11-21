@@ -8,6 +8,7 @@ const AppVersion = process.env.npm_package_version
 
 export default defineConfig({
   build: {
+    target: 'esnext',
     rollupOptions: {
       input: {
         'scamper-docs': resolve(__dirname, 'docs.html'),
