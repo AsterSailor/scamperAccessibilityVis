@@ -1238,7 +1238,7 @@ function structHeight(struct: Value.Struct) {
   for (let thing in struct) {
     thing = struct[thing]
     if(typeof thing === 'string' || typeof thing === 'number' || typeof thing === 'boolean' ) {
-      height = height + 1
+      height = height + 3
     } else if (Value.isPair(thing)) {
       //@ts-ignore
       if(thing.isList) {
