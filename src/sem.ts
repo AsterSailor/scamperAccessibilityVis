@@ -85,7 +85,7 @@ class ExecutionState {
   }
 
   public getBoundsEnv(libNum: number): [Id, Value.T][] | undefined {
-    return this.env.toString2(libNum)
+    return this.env.returnEnv(libNum)
   }
 
   public getStack() {

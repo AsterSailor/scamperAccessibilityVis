@@ -404,7 +404,7 @@ export class Env {
   }
 
 
-  public toString2(libNum: number) {
+  public returnEnv(libNum: number) {
     let bounds: [Id, Value.T][] = []
 
     let parent = this.parent
@@ -425,8 +425,6 @@ export class Env {
       const iterator0 = this.bindings[Symbol.iterator]();
       //let count0 = 0
       
-      let structFound = null;
-      let structLength = 2;
       let structString = null;
       for (const item of iterator0) {
         
@@ -446,7 +444,6 @@ export class Env {
       for(let i = 0; i < kernel.length; i++) {
         bounds.push(kernel[i])
       }
-
 
       while(parent!.parent !== undefined) {
         let kernel = []
