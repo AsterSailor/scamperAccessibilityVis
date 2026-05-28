@@ -261,7 +261,7 @@ export declare class Env {
     remove(...names: Id[]): void;
     clone(): Env;
     quotient(...names: Id[]): Env;
-    toString2(libNum: number): [string, Value.T][];
+    returnEnv(libNum: number): [string, Value.T][];
 }
 export type Library = {
     lib: [string, Value.T][];
